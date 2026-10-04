@@ -1,0 +1,210 @@
+﻿<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>남구 84형 가격 이평선 (단기 5 / 장기 20)</title>
+<style>
+:root{color-scheme:light}
+body{margin:0;padding:8px;background:#fff;color:#000;font-family:"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif}
+#wrap{max-width:960px;margin:0 auto}
+h1{font-size:15px;font-weight:normal;margin:0 0 6px}
+#cv{display:block;width:100%;background:#fff;touch-action:pan-y}
+#unit{margin:10px 0 4px;font-size:12px;color:#5a5a5a}
+#tw{overflow-x:auto}
+table{border-collapse:collapse;min-width:720px;width:100%;font-size:12px}
+th,td{border:1px solid #bebebe;text-align:center;padding:2px 0;line-height:1.35}
+th{background:#ebebeb;font-weight:normal}
+.l{color:#00f}.s{color:#f00}
+#note{margin-top:4px;font-size:12px;color:#5a5a5a}
+</style></head><body><div id="wrap"><h1>남구 84형 가격 이평선 (단기 5 / 장기 20) (점 라벨: 연말 값, 억)</h1><canvas id="cv"></canvas><div id="unit">(단위: 억 / 윗줄 파랑=장기, 아랫줄 빨강=단기)</div><div id="tw"><table id="tb"><tr><th>연도</th><th>1월</th><th>2월</th><th>3월</th><th>4월</th><th>5월</th><th>6월</th><th>7월</th><th>8월</th><th>9월</th><th>10월</th><th>11월</th><th>12월</th></tr><tr><th>2006</th><td><span class="l">1.27</span><br><span class="s">1.27</span></td><td><span class="l">1.25</span><br><span class="s">1.25</span></td><td><span class="l">1.27</span><br><span class="s">1.27</span></td><td><span class="l">1.26</span><br><span class="s">1.26</span></td><td><span class="l">1.26</span><br><span class="s">1.26</span></td><td><span class="l">1.24</span><br><span class="s">1.24</span></td><td><span class="l">1.24</span><br><span class="s">1.24</span></td><td><span class="l">1.28</span><br><span class="s">1.29</span></td><td><span class="l">1.29</span><br><span class="s">1.31</span></td><td><span class="l">1.29</span><br><span class="s">1.33</span></td><td><span class="l">1.31</span><br><span class="s">1.38</span></td><td><span class="l">1.33</span><br><span class="s">1.41</span></td></tr><tr><th>2007</th><td><span class="l">1.34</span><br><span class="s">1.39</span></td><td><span class="l">1.34</span><br><span class="s">1.39</span></td><td><span class="l">1.34</span><br><span class="s">1.40</span></td><td><span class="l">1.34</span><br><span class="s">1.39</span></td><td><span class="l">1.34</span><br><span class="s">1.35</span></td><td><span class="l">1.34</span><br><span class="s">1.34</span></td><td><span class="l">1.33</span><br><span class="s">1.33</span></td><td><span class="l">1.33</span><br><span class="s">1.29</span></td><td><span class="l">1.34</span><br><span class="s">1.30</span></td><td><span class="l">1.34</span><br><span class="s">1.32</span></td><td><span class="l">1.33</span><br><span class="s">1.30</span></td><td><span class="l">1.35</span><br><span class="s">1.35</span></td></tr><tr><th>2008</th><td><span class="l">1.35</span><br><span class="s">1.35</span></td><td><span class="l">1.33</span><br><span class="s">1.30</span></td><td><span class="l">1.33</span><br><span class="s">1.29</span></td><td><span class="l">1.33</span><br><span class="s">1.30</span></td><td><span class="l">1.33</span><br><span class="s">1.31</span></td><td><span class="l">1.34</span><br><span class="s">1.32</span></td><td><span class="l">1.33</span><br><span class="s">1.37</span></td><td><span class="l">1.32</span><br><span class="s">1.38</span></td><td><span class="l">1.32</span><br><span class="s">1.34</span></td><td><span class="l">1.32</span><br><span class="s">1.30</span></td><td><span class="l">1.32</span><br><span class="s">1.29</span></td><td><span class="l">1.32</span><br><span class="s">1.31</span></td></tr><tr><th>2009</th><td><span class="l">1.32</span><br><span class="s">1.33</span></td><td><span class="l">1.32</span><br><span class="s">1.40</span></td><td><span class="l">1.32</span><br><span class="s">1.40</span></td><td><span class="l">1.35</span><br><span class="s">1.50</span></td><td><span class="l">1.38</span><br><span class="s">1.59</span></td><td><span class="l">1.39</span><br><span class="s">1.58</span></td><td><span class="l">1.40</span><br><span class="s">1.62</span></td><td><span class="l">1.40</span><br><span class="s">1.62</span></td><td><span class="l">1.43</span><br><span class="s">1.63</span></td><td><span class="l">1.50</span><br><span class="s">1.63</span></td><td><span class="l">1.53</span><br><span class="s">1.66</span></td><td><span class="l">1.54</span><br><span class="s">1.65</span></td></tr><tr><th>2010</th><td><span class="l">1.55</span><br><span class="s">1.70</span></td><td><span class="l">1.54</span><br><span class="s">1.60</span></td><td><span class="l">1.54</span><br><span class="s">1.54</span></td><td><span class="l">1.56</span><br><span class="s">1.51</span></td><td><span class="l">1.57</span><br><span class="s">1.48</span></td><td><span class="l">1.58</span><br><span class="s">1.46</span></td><td><span class="l">1.58</span><br><span class="s">1.52</span></td><td><span class="l">1.58</span><br><span class="s">1.55</span></td><td><span class="l">1.57</span><br><span class="s">1.52</span></td><td><span class="l">1.58</span><br><span class="s">1.52</span></td><td><span class="l">1.59</span><br><span class="s">1.53</span></td><td><span class="l">1.58</span><br><span class="s">1.54</span></td></tr><tr><th>2011</th><td><span class="l">1.57</span><br><span class="s">1.54</span></td><td><span class="l">1.57</span><br><span class="s">1.55</span></td><td><span class="l">1.57</span><br><span class="s">1.59</span></td><td><span class="l">1.58</span><br><span class="s">1.60</span></td><td><span class="l">1.59</span><br><span class="s">1.67</span></td><td><span class="l">1.60</span><br><span class="s">1.72</span></td><td><span class="l">1.61</span><br><span class="s">1.76</span></td><td><span class="l">1.62</span><br><span class="s">1.79</span></td><td><span class="l">1.62</span><br><span class="s">1.81</span></td><td><span class="l">1.64</span><br><span class="s">1.75</span></td><td><span class="l">1.65</span><br><span class="s">1.71</span></td><td><span class="l">1.65</span><br><span class="s">1.71</span></td></tr><tr><th>2012</th><td><span class="l">1.66</span><br><span class="s">1.69</span></td><td><span class="l">1.66</span><br><span class="s">1.68</span></td><td><span class="l">1.67</span><br><span class="s">1.69</span></td><td><span class="l">1.67</span><br><span class="s">1.70</span></td><td><span class="l">1.69</span><br><span class="s">1.73</span></td><td><span class="l">1.71</span><br><span class="s">1.77</span></td><td><span class="l">1.71</span><br><span class="s">1.79</span></td><td><span class="l">1.72</span><br><span class="s">1.82</span></td><td><span class="l">1.73</span><br><span class="s">1.80</span></td><td><span class="l">1.76</span><br><span class="s">1.86</span></td><td><span class="l">1.78</span><br><span class="s">1.87</span></td><td><span class="l">1.78</span><br><span class="s">1.86</span></td></tr><tr><th>2013</th><td><span class="l">1.77</span><br><span class="s">1.84</span></td><td><span class="l">1.77</span><br><span class="s">1.87</span></td><td><span class="l">1.78</span><br><span class="s">1.81</span></td><td><span class="l">1.77</span><br><span class="s">1.77</span></td><td><span class="l">1.78</span><br><span class="s">1.81</span></td><td><span class="l">1.79</span><br><span class="s">1.83</span></td><td><span class="l">1.80</span><br><span class="s">1.84</span></td><td><span class="l">1.81</span><br><span class="s">1.85</span></td><td><span class="l">1.83</span><br><span class="s">1.93</span></td><td><span class="l">1.84</span><br><span class="s">1.93</span></td><td><span class="l">1.85</span><br><span class="s">1.93</span></td><td><span class="l">1.86</span><br><span class="s">1.97</span></td></tr><tr><th>2014</th><td><span class="l">1.87</span><br><span class="s">1.99</span></td><td><span class="l">1.88</span><br><span class="s">1.97</span></td><td><span class="l">1.89</span><br><span class="s">2.00</span></td><td><span class="l">1.90</span><br><span class="s">2.01</span></td><td><span class="l">1.92</span><br><span class="s">2.01</span></td><td><span class="l">1.92</span><br><span class="s">2.06</span></td><td><span class="l">1.94</span><br><span class="s">2.09</span></td><td><span class="l">1.95</span><br><span class="s">2.11</span></td><td><span class="l">1.97</span><br><span class="s">2.12</span></td><td><span class="l">1.99</span><br><span class="s">2.16</span></td><td><span class="l">2.01</span><br><span class="s">2.14</span></td><td><span class="l">2.04</span><br><span class="s">2.18</span></td></tr><tr><th>2015</th><td><span class="l">2.07</span><br><span class="s">2.24</span></td><td><span class="l">2.09</span><br><span class="s">2.31</span></td><td><span class="l">2.12</span><br><span class="s">2.35</span></td><td><span class="l">2.14</span><br><span class="s">2.36</span></td><td><span class="l">2.16</span><br><span class="s">2.40</span></td><td><span class="l">2.21</span><br><span class="s">2.47</span></td><td><span class="l">2.24</span><br><span class="s">2.51</span></td><td><span class="l">2.27</span><br><span class="s">2.60</span></td><td><span class="l">2.30</span><br><span class="s">2.73</span></td><td><span class="l">2.34</span><br><span class="s">2.77</span></td><td><span class="l">2.37</span><br><span class="s">2.76</span></td><td><span class="l">2.40</span><br><span class="s">2.78</span></td></tr><tr><th>2016</th><td><span class="l">2.43</span><br><span class="s">2.78</span></td><td><span class="l">2.45</span><br><span class="s">2.75</span></td><td><span class="l">2.47</span><br><span class="s">2.66</span></td><td><span class="l">2.51</span><br><span class="s">2.71</span></td><td><span class="l">2.55</span><br><span class="s">2.71</span></td><td><span class="l">2.58</span><br><span class="s">2.69</span></td><td><span class="l">2.59</span><br><span class="s">2.64</span></td><td><span class="l">2.61</span><br><span class="s">2.71</span></td><td><span class="l">2.64</span><br><span class="s">2.71</span></td><td><span class="l">2.66</span><br><span class="s">2.71</span></td><td><span class="l">2.67</span><br><span class="s">2.66</span></td><td><span class="l">2.70</span><br><span class="s">2.68</span></td></tr><tr><th>2017</th><td><span class="l">2.70</span><br><span class="s">2.65</span></td><td><span class="l">2.69</span><br><span class="s">2.62</span></td><td><span class="l">2.69</span><br><span class="s">2.60</span></td><td><span class="l">2.70</span><br><span class="s">2.69</span></td><td><span class="l">2.70</span><br><span class="s">2.73</span></td><td><span class="l">2.71</span><br><span class="s">2.78</span></td><td><span class="l">2.71</span><br><span class="s">2.81</span></td><td><span class="l">2.72</span><br><span class="s">2.84</span></td><td><span class="l">2.72</span><br><span class="s">2.83</span></td><td><span class="l">2.71</span><br><span class="s">2.78</span></td><td><span class="l">2.72</span><br><span class="s">2.73</span></td><td><span class="l">2.73</span><br><span class="s">2.78</span></td></tr><tr><th>2018</th><td><span class="l">2.74</span><br><span class="s">2.80</span></td><td><span class="l">2.74</span><br><span class="s">2.78</span></td><td><span class="l">2.76</span><br><span class="s">2.86</span></td><td><span class="l">2.75</span><br><span class="s">2.84</span></td><td><span class="l">2.76</span><br><span class="s">2.82</span></td><td><span class="l">2.76</span><br><span class="s">2.81</span></td><td><span class="l">2.78</span><br><span class="s">2.82</span></td><td><span class="l">2.80</span><br><span class="s">2.85</span></td><td><span class="l">2.82</span><br><span class="s">2.96</span></td><td><span class="l">2.83</span><br><span class="s">2.91</span></td><td><span class="l">2.85</span><br><span class="s">2.93</span></td><td><span class="l">2.84</span><br><span class="s">2.92</span></td></tr><tr><th>2019</th><td><span class="l">2.82</span><br><span class="s">2.81</span></td><td><span class="l">2.82</span><br><span class="s">2.77</span></td><td><span class="l">2.82</span><br><span class="s">2.73</span></td><td><span class="l">2.83</span><br><span class="s">2.76</span></td><td><span class="l">2.82</span><br><span class="s">2.73</span></td><td><span class="l">2.83</span><br><span class="s">2.81</span></td><td><span class="l">2.84</span><br><span class="s">2.79</span></td><td><span class="l">2.83</span><br><span class="s">2.82</span></td><td><span class="l">2.84</span><br><span class="s">2.82</span></td><td><span class="l">2.85</span><br><span class="s">2.89</span></td><td><span class="l">2.88</span><br><span class="s">3.00</span></td><td><span class="l">2.92</span><br><span class="s">3.09</span></td></tr><tr><th>2020</th><td><span class="l">2.92</span><br><span class="s">3.10</span></td><td><span class="l">2.94</span><br><span class="s">3.14</span></td><td><span class="l">2.95</span><br><span class="s">3.15</span></td><td><span class="l">2.95</span><br><span class="s">3.13</span></td><td><span class="l">2.94</span><br><span class="s">3.05</span></td><td><span class="l">2.99</span><br><span class="s">3.12</span></td><td><span class="l">3.04</span><br><span class="s">3.23</span></td><td><span class="l">3.07</span><br><span class="s">3.25</span></td><td><span class="l">3.11</span><br><span class="s">3.30</span></td><td><span class="l">3.12</span><br><span class="s">3.33</span></td><td><span class="l">3.19</span><br><span class="s">3.49</span></td><td><span class="l">3.22</span><br><span class="s">3.52</span></td></tr><tr><th>2021</th><td><span class="l">3.25</span><br><span class="s">3.55</span></td><td><span class="l">3.28</span><br><span class="s">3.60</span></td><td><span class="l">3.31</span><br><span class="s">3.66</span></td><td><span class="l">3.36</span><br><span class="s">3.74</span></td><td><span class="l">3.40</span><br><span class="s">3.86</span></td><td><span class="l">3.42</span><br><span class="s">3.90</span></td><td><span class="l">3.43</span><br><span class="s">3.95</span></td><td><span class="l">3.45</span><br><span class="s">4.16</span></td><td><span class="l">3.50</span><br><span class="s">4.15</span></td><td><span class="l">3.53</span><br><span class="s">4.05</span></td><td><span class="l">3.54</span><br><span class="s">4.15</span></td><td><span class="l">3.56</span><br><span class="s">4.03</span></td></tr><tr><th>2022</th><td><span class="l">3.59</span><br><span class="s">3.87</span></td><td><span class="l">3.66</span><br><span class="s">3.78</span></td><td><span class="l">3.68</span><br><span class="s">3.58</span></td><td><span class="l">3.72</span><br><span class="s">3.51</span></td><td><span class="l">3.76</span><br><span class="s">3.64</span></td><td><span class="l">3.82</span><br><span class="s">3.90</span></td><td><span class="l">3.86</span><br><span class="s">3.82</span></td><td><span class="l">3.87</span><br><span class="s">3.86</span></td><td><span class="l">3.90</span><br><span class="s">3.91</span></td><td><span class="l">3.92</span><br><span class="s">3.83</span></td><td><span class="l">3.96</span><br><span class="s">3.70</span></td><td><span class="l">3.92</span><br><span class="s">3.71</span></td></tr><tr><th>2023</th><td><span class="l">3.81</span><br><span class="s">3.53</span></td><td><span class="l">3.84</span><br><span class="s">3.65</span></td><td><span class="l">3.79</span><br><span class="s">3.64</span></td><td><span class="l">3.75</span><br><span class="s">3.66</span></td><td><span class="l">3.75</span><br><span class="s">3.72</span></td><td><span class="l">3.72</span><br><span class="s">3.75</span></td><td><span class="l">3.72</span><br><span class="s">3.73</span></td><td><span class="l">3.74</span><br><span class="s">3.77</span></td><td><span class="l">3.74</span><br><span class="s">3.78</span></td><td><span class="l">3.72</span><br><span class="s">3.70</span></td><td><span class="l">3.75</span><br><span class="s">3.76</span></td><td><span class="l">3.74</span><br><span class="s">3.73</span></td></tr><tr><th>2024</th><td><span class="l">3.74</span><br><span class="s">3.73</span></td><td><span class="l">3.74</span><br><span class="s">3.78</span></td><td><span class="l">3.75</span><br><span class="s">3.88</span></td><td><span class="l">3.74</span><br><span class="s">3.74</span></td><td><span class="l">3.74</span><br><span class="s">3.80</span></td><td><span class="l">3.74</span><br><span class="s">3.75</span></td><td><span class="l">3.73</span><br><span class="s">3.69</span></td><td><span class="l">3.75</span><br><span class="s">3.72</span></td><td><span class="l">3.76</span><br><span class="s">3.77</span></td><td><span class="l">3.78</span><br><span class="s">3.83</span></td><td><span class="l">3.79</span><br><span class="s">3.89</span></td><td><span class="l">3.79</span><br><span class="s">3.89</span></td></tr><tr><th>2025</th><td><span class="l">3.77</span><br><span class="s">3.83</span></td><td><span class="l">3.77</span><br><span class="s">3.83</span></td><td><span class="l">3.77</span><br><span class="s">3.72</span></td><td><span class="l">3.76</span><br><span class="s">3.62</span></td><td><span class="l">3.76</span><br><span class="s">3.66</span></td><td><span class="l">3.78</span><br><span class="s">3.74</span></td><td><span class="l">3.76</span><br><span class="s">3.72</span></td><td><span class="l">3.77</span><br><span class="s">3.73</span></td><td><span class="l">3.74</span><br><span class="s">3.66</span></td><td><span class="l">3.74</span><br><span class="s">3.68</span></td><td><span class="l">3.73</span><br><span class="s">3.64</span></td><td><span class="l">3.77</span><br><span class="s">3.76</span></td></tr><tr><th>2026</th><td><span class="l">3.76</span><br><span class="s">3.76</span></td><td><span class="l">3.77</span><br><span class="s">3.86</span></td><td><span class="l">3.80</span><br><span class="s">3.90</span></td><td><span class="l">3.79</span><br><span class="s">3.93</span></td><td><span class="l">3.80</span><br><span class="s">3.88</span></td><td><span class="l">3.80</span><br><span class="s">3.97</span></td><td><span class="l">3.83</span><br><span class="s">4.08</span></td><td><span class="l">3.86</span><br><span class="s">4.13</span></td><td></td><td></td><td></td><td></td></tr></table></div><script>var D={ym:[200601,200602,200603,200604,200605,200606,200607,200608,200609,200610,200611,200612,200701,200702,200703,200704,200705,200706,200707,200708,200709,200710,200711,200712,200801,200802,200803,200804,200805,200806,200807,200808,200809,200810,200811,200812,200901,200902,200903,200904,200905,200906,200907,200908,200909,200910,200911,200912,201001,201002,201003,201004,201005,201006,201007,201008,201009,201010,201011,201012,201101,201102,201103,201104,201105,201106,201107,201108,201109,201110,201111,201112,201201,201202,201203,201204,201205,201206,201207,201208,201209,201210,201211,201212,201301,201302,201303,201304,201305,201306,201307,201308,201309,201310,201311,201312,201401,201402,201403,201404,201405,201406,201407,201408,201409,201410,201411,201412,201501,201502,201503,201504,201505,201506,201507,201508,201509,201510,201511,201512,201601,201602,201603,201604,201605,201606,201607,201608,201609,201610,201611,201612,201701,201702,201703,201704,201705,201706,201707,201708,201709,201710,201711,201712,201801,201802,201803,201804,201805,201806,201807,201808,201809,201810,201811,201812,201901,201902,201903,201904,201905,201906,201907,201908,201909,201910,201911,201912,202001,202002,202003,202004,202005,202006,202007,202008,202009,202010,202011,202012,202101,202102,202103,202104,202105,202106,202107,202108,202109,202110,202111,202112,202201,202202,202203,202204,202205,202206,202207,202208,202209,202210,202211,202212,202301,202302,202303,202304,202305,202306,202307,202308,202309,202310,202311,202312,202401,202402,202403,202404,202405,202406,202407,202408,202409,202410,202411,202412,202501,202502,202503,202504,202505,202506,202507,202508,202509,202510,202511,202512,202601,202602,202603,202604,202605,202606,202607,202608],l:[12700,12452.7777778,12747.6470588,12644.5098039,12588.9393939,12417.9487179,12437.2159091,12820.2380952,12912.1900826,12918.2692308,13144.760479,13328.5978836,13354.3396226,13353.8495575,13428.0082988,13420.3125,13368.037037,13358.1690141,13329.15,13308.0744337,13354.7611465,13380.921875,13345.2987421,13479.3809524,13513.9844237,13320.8639309,13289.4560327,13266.2469636,13335.9206349,13392.2105263,13333.0472279,13226.744856,13161.931677,13153.8412371,13171.960499,13178.1458774,13197.0627706,13233.275641,13241.7692308,13469.9751037,13771.1276596,13856.7547529,13981.9222011,13974.0276753,14259.8642857,15000.1531532,15268.4051522,15394.3085847,15509.1465721,15392.1126437,15412.2847534,15556.3522727,15679.5617978,15794.0561798,15772.9120879,15800.5147059,15739.3044355,15758.7948207,15884.5019531,15788.0844794,15686.4765784,15660.8928571,15683.7218045,15835.8909091,15945.1018519,16047.2304833,16051.219963,16153.3153153,16184.3133803,16368.8224956,16456.5619546,16501.9863014,16573.2302405,16598.6189684,16674.4227642,16739.2384106,16927.7777778,17096.8954248,17142.4713584,17239.233279,17286.7269737,17609.5688226,17786.8358714,17847.5132275,17697.1942446,17663.2358318,17751.3556338,17736.2068966,17825,17930.4059041,18009.1465677,18111.5442561,18293.2514178,18424.9618321,18543.5029354,18648.8953488,18726.990099,18791.7928287,18925.9844055,18972.6968504,19156.5166341,19242.42,19378.0482897,19532.6706827,19691.6242661,19903.1764706,20135,20444.5228216,20699.7033898,20897.9025424,21170.7142857,21412.7586207,21639.7171717,22054.5473251,22397.7663934,22716.9979296,23036.8958333,23440.3099174,23740.0438596,23976.6829268,24322.8167053,24466.8741093,24692.3569682,25106.4313725,25474.6865285,25779.458221,25904.6229947,26145.0106667,26435.1185984,26557.8115183,26700.353562,26981.7313019,27030.2394366,26946.281337,26909.9014085,26985.1805556,26974.4917582,27067.7209945,27130.9224599,27174.1457801,27210.2972973,27132.7947494,27199.5093897,27325.3357143,27394.6310905,27407.367713,27620.368071,27525.6926503,27574.4629213,27640.3046512,27806.8964706,28027.5638051,28219.2906178,28310.2941176,28451.0273973,28362.9672897,28236.8483412,28222.1130221,28202.1268657,28315.6056701,28173.2270408,28337.4808184,28397.4617347,28317.8517588,28376.8114144,28493.5406091,28761.1097257,29151.9827586,29167.9116945,29386.0714286,29465.6293706,29534.3071594,29446.6628176,29873.0215054,30429.5508982,30685.2868069,31120.6830601,31189.1431095,31937.9449838,32236.7879747,32514.8780488,32806.127451,33080.2459016,33554.6052632,34006.9397993,34194.6218487,34322.0070423,34500.4553734,34955.1594747,35257.5342466,35435.5864811,35639.1975309,35921.3062099,36597.9166667,36781.1452514,37153.8109756,37599.0068493,38222.3809524,38585.0934579,38678.5589744,39039.9946809,39170.2307692,39627.1266667,39241.1203008,38093.740458,38362.9545455,37908.7919463,37515.0920245,37456.2768362,37188.4789474,37234.5023923,37351.995671,37449.3019608,37179.0359712,37472.8783784,37424.4220779,37398.9503106,37443.8614458,37544,37356.5946667,37437.9368687,37359.2214286,37302.8735892,37453.4831933,37554.5763747,37770.996063,37913.1108949,37871.6264368,37707.7367387,37746.3274162,37731.5968379,37578.5330661,37616.9522863,37814.8674464,37644.8197674,37717.2967245,37375.9,37370.6320583,37295.039356,37669.5159574,37635.0296167,37703.7029877,37964.4587629,37905.8596187,37996.4752981,38018.1821306,38300.0664395,38588.1502591],s:[12700,12452.7777778,12747.6470588,12644.5098039,12588.9393939,12385.7142857,12433.2142857,12855,13107.2142857,13257.890625,13781.741573,14105.2475248,13878.4579439,13862.8095238,14025,13937.3595506,13460.0617284,13369.4444444,13253.7162162,12883.0147059,13021.1363636,13186.3970588,12992.7205882,13517.1212121,13546.974359,12973.3561644,12916.209205,13046.2591093,13099.6293436,13205.9375,13736.3628319,13819.2244898,13423.7708333,12952.372093,12940.3037975,13073.2533333,13317.7192982,14009.8245614,14005.4385965,14968.9855072,15870.9545455,15820.3409091,16211.0629921,16206.4642857,16343.974359,16312.0547945,16556.6428571,16482.781457,16994.6428571,15960.0381679,15356.6956522,15130.3603604,14828.5454545,14647.1296296,15185.7575758,15501.5238095,15230.1769912,15193.5964912,15345.3225806,15384.7154472,15414.56,15533.4285714,15870.2547771,15987.5280899,16705.2406417,17165.3367876,17562.4293785,17875,18115.1898734,17464.1875,17081.4666667,17096.8831169,16873.5036496,16772.8368794,16857.2413793,16974.6323529,17330.8510638,17706.5972222,17918.6567164,18224.7933884,18036.0465116,18575.9541985,18679.0441176,18591.5671642,18429.7692308,18669.469697,18117.9577465,17693.1343284,18053.1724138,18307.6027397,18361.6901408,18524.6153846,19270.8695652,19320.7207207,19313.5964912,19685.3982301,19856.9565217,19710.2564103,19963.0081301,20064.4067797,20103.2258065,20615.3174603,20898.9312977,21088.3193277,21204.2105263,21572.5954198,21403.8095238,21800.4201681,22358.8235294,23124.2990654,23462.962963,23639.1269841,24012.109375,24742.8,25138.8461538,25995.8333333,27301.6666667,27731.6037736,27552.688172,27789.8024691,27828.1111111,27468.2686567,26639.7142857,27147.5211268,27057.4264706,26859.9295775,26388.0379747,27052.4117647,27130.5487805,27050.0485437,26631.5086207,26819.5221239,26526.9074074,26187.0442478,25980.3980583,26878.5247525,27267.4285714,27808.2300885,28107.8703704,28402.1367521,28265.1260504,27789.3442623,27335.8333333,27838.8888889,27980.5555556,27783.1818182,28583.7837838,28439.8148148,28212.1495327,28082.3529412,28247.3684211,28534.4086022,29559.375,29105.9090909,29299.0990991,29193.75,28116.1458333,27673.4939759,27349.3382353,27581.4179104,27326.5662651,28069.2857143,27863.8571429,28233.6283186,28221.9512195,28916.9642857,29967.3553719,30945.9016393,31012.109375,31444.3609023,31521.5384615,31270.8,30507.3170732,31225.9615385,32268.8202247,32544.4444444,33000.2358491,33331.25,34870.8144796,35234.3434343,35522,36015.5844156,36587.9194631,37416.9902913,38582.0224719,38998.3695652,39527.2727273,41593.442623,41499.0566038,40490.2173913,41476.3157895,40339.5348837,38704.8780488,37809.6774194,35796,35050,36350.5555556,39045.9090909,38211.4814815,38601.9714286,39126.2571429,38298.6774194,36959.9615385,37082.2272727,35270.44,36451.1388889,36355.1052632,36595.8243243,37217.9587629,37505.5333333,37340.8782609,37716.008,37755.7293233,36955.3863636,37565.351145,37302.1393443,37325.3302752,37785.8585859,38775.7731959,37437.0175439,37952.195122,37485.8139535,36896.1313869,37189.0333333,37676.1347518,38341.1081081,38865.6092715,38901.3529412,38273.2461538,38315.4710744,37156.840708,36171.3636364,36612.7192982,37381.6176471,37202.8571429,37288.5185185,36614.2857143,36799.6551724,36434.6153846,37584.5679012,37614.3258427,38570.5357143,39021.2235294,39298.2678571,38845.4817073,39734.3525641,40813.2485207,41327.54],li:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],si:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],nl:20,ns:5};
+(function(){
+var cv=document.getElementById('cv');
+var n=D.ym.length;
+var ptr={on:false,x:0,y:0};
+var cw=0,ch=0,pL=70,pT=28,pR=0,pB=0;
+var FF='"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif';
+function eok(v){var e=v/10000;var r=Math.floor(e*100+(e>=0?0.5:-0.5))/100;return r.toFixed(2);}
+function p2(x){return x<10?'0'+x:''+x;}
+function ymS(ym){return Math.floor(ym/100)+'.'+p2(ym%100);}
+function inPlot(x,y){return x>=pL&&x<=pR&&y>=pT&&y<=pB;}
+function hl(g,y,x0,x1){g.beginPath();g.moveTo(x0,y+0.5);g.lineTo(x1,y+0.5);g.stroke();}
+function vl(g,x,y0,y1){g.beginPath();g.moveTo(x+0.5,y0);g.lineTo(x+0.5,y1);g.stroke();}
+function dot(g,x,y,r,c){g.beginPath();g.arc(x+0.5,y+0.5,r,0,6.2832);g.fillStyle=c;g.fill();g.lineWidth=1;g.strokeStyle=c;g.stroke();}
+function draw(){
+var rc=cv.getBoundingClientRect();
+cw=Math.max(300,Math.floor(rc.width));
+ch=Math.max(260,Math.round(cw*0.525));
+var dpr=window.devicePixelRatio||1;
+cv.style.height=ch+'px';
+cv.width=Math.round(cw*dpr);cv.height=Math.round(ch*dpr);
+var g=cv.getContext('2d');
+g.setTransform(dpr,0,0,dpr,0,0);
+g.fillStyle='#fff';g.fillRect(0,0,cw,ch);
+g.textBaseline='top';
+pL=cw<500?52:70;pT=28;pR=cw-16;pB=ch-40;
+var pW=pR-pL,pH=pB-pT;
+if(pW<60||pH<40)return;
+var dStep=pW/n,i;
+function XOf(k){return pL+Math.floor((k+0.5)*dStep+0.5);}
+var vmin=D.s[0],vmax=vmin;
+for(i=0;i<n;i++){
+var a=D.s[i],b=D.l[i];
+if(a<vmin)vmin=a;if(a>vmax)vmax=a;
+if(b<vmin)vmin=b;if(b>vmax)vmax=b;
+}
+var pad=(vmax-vmin)*0.08;
+if(vmax-vmin<1e-9){pad=Math.abs(vmax)*0.05;if(pad<1)pad=1;}
+var lo=vmin-pad,hi=vmax+pad;
+function YOf(v){return pB-Math.floor((v-lo)/(hi-lo)*pH+0.5);}
+g.font='12px '+FF;
+g.lineWidth=1;g.strokeStyle='#e1e1e1';g.fillStyle='#000';
+var loE=lo/10000,hiE=hi/10000;
+var raw=(hiE-loE)/5;if(raw<0.002)raw=0.002;
+var mag=Math.pow(10,Math.floor(Math.log(raw)/Math.LN10));
+var nm=raw/mag;
+var nice=nm<=1?1:nm<=2?2:nm<=2.5?2.5:nm<=5?5:10;
+var ts=nice*mag;if(ts<0.01)ts=0.01;
+var k0=Math.ceil(loE/ts-1e-9);
+g.textAlign='right';
+for(var q=0;q<60;q++){
+var t=(k0+q)*ts;
+if(t>hiE+1e-9)break;
+var y=YOf(t*10000);
+if(y<pT||y>pB)continue;
+g.strokeStyle='#e1e1e1';hl(g,y,pL,pR);
+g.fillStyle='#000';g.fillText(eok(t*10000)+'\uc5b5',pL-6,y-7);
+}
+var ev=[1,3,6,12,24,60],every=60;
+for(i=0;i<ev.length;i++){if(dStep*ev[i]>=60){every=ev[i];break;}}
+g.textAlign='center';
+for(i=0;i<n;i++){
+var ym=D.ym[i];
+var am=Math.floor(ym/100)*12+(ym%100-1);
+if(am%every!==0)continue;
+var x=XOf(i);
+if(x<pL||x>pR)continue;
+g.strokeStyle='#e1e1e1';vl(g,x,pT,pB);
+g.fillStyle='#000';g.fillText(ymS(ym),x,pB+4);
+}
+g.strokeStyle='#787878';
+g.beginPath();g.moveTo(pL+0.5,pT);g.lineTo(pL+0.5,pB+0.5);g.lineTo(pR,pB+0.5);g.stroke();
+g.save();
+g.beginPath();g.rect(pL,pT,pW+1,pH+1);g.clip();
+g.lineWidth=2;g.lineJoin='round';
+for(var sr=0;sr<2;sr++){
+var vv=sr===0?D.l:D.s;
+g.strokeStyle=sr===0?'#0000ff':'#ff0000';
+g.beginPath();
+for(i=0;i<n;i++){
+if(i===0)g.moveTo(XOf(i)+0.5,YOf(vv[i])+0.5);else g.lineTo(XOf(i)+0.5,YOf(vv[i])+0.5);
+}
+if(n===1)g.lineTo(XOf(0)+1.5,YOf(vv[0])+0.5);
+g.stroke();
+}
+g.restore();
+g.lineWidth=1;
+
+var tL='\uc7a5\uae30('+D.nl+'\uac1c\uc6d4)',tS='\ub2e8\uae30('+D.ns+'\uac1c\uc6d4)';
+g.font='12px '+FF;g.textAlign='left';
+var wL=g.measureText(tL).width,wS=g.measureText(tS).width;
+var smp=22,gp=6,bt=18;
+var tot=smp+gp+wL+bt+smp+gp+wS;
+var x0=pR-tot,yM=14;
+g.lineWidth=2;
+g.strokeStyle='#0000ff';g.beginPath();g.moveTo(x0,yM+0.5);g.lineTo(x0+smp,yM+0.5);g.stroke();
+g.fillStyle='#0000ff';g.fillText(tL,x0+smp+gp,yM-7);
+var x1=x0+smp+gp+wL+bt;
+g.strokeStyle='#ff0000';g.beginPath();g.moveTo(x1,yM+0.5);g.lineTo(x1+smp,yM+0.5);g.stroke();
+g.fillStyle='#ff0000';g.fillText(tS,x1+smp+gp,yM-7);
+g.lineWidth=1;
+g.font='11px '+FF;
+var gap=36;
+var stride=Math.ceil(gap/(12*dStep));if(stride<1)stride=1;
+var lastX=XOf(n-1);
+var idxs=[];
+for(i=0;i<n-1;i++){
+if(D.ym[i]%100!==12)continue;
+var yf=Math.floor(D.ym[n-1]/100)-Math.floor(D.ym[i]/100);
+if(yf%stride!==0)continue;
+if(lastX-XOf(i)<gap)continue;
+idxs.push(i);
+}
+idxs.push(n-1);
+g.textAlign='center';
+for(var k=0;k<idxs.length;k++){
+var id=idxs[k],xx=XOf(id);
+for(var s2=0;s2<2;s2++){
+var v=s2===0?D.l[id]:D.s[id],ot=s2===0?D.s[id]:D.l[id];
+var ab=(v>ot)||(v===ot&&s2===1);
+var col=s2===0?'#0000ff':'#ff0000';
+var yy=YOf(v);
+dot(g,xx,yy,3.5,col);
+var ly=ab?(yy-18):(yy+5);
+if(ly<pT)ly=pT;
+if(ly>pB-14)ly=pB-14;
+var lx0=xx-20,lx1=xx+20;
+if(lx0<0){lx1-=lx0;lx0=0;}
+if(lx1>cw){lx0-=(lx1-cw);lx1=cw;}
+g.fillStyle=col;g.fillText(eok(v),(lx0+lx1)/2,ly);
+}
+}
+g.font='12px '+FF;
+if(ptr.on&&inPlot(ptr.x,ptr.y)){
+var ix=Math.floor((ptr.x-pL)/dStep);
+if(ix<0)ix=0;if(ix>n-1)ix=n-1;
+var sx=XOf(ix);
+var mv=lo+(pB-ptr.y)/pH*(hi-lo);
+var cy=D.ym[ix];
+g.strokeStyle='#5a5a5a';g.lineWidth=1;
+if(g.setLineDash)g.setLineDash([2,3]);
+vl(g,sx,pT,pB);hl(g,Math.round(ptr.y),pL,pR);
+if(g.setLineDash)g.setLineDash([]);
+dot(g,sx,YOf(D.l[ix]),4.5,'#0000ff');
+dot(g,sx,YOf(D.s[ix]),4.5,'#ff0000');
+g.textAlign='center';
+var sxl=ymS(cy);
+var bw=g.measureText(sxl).width+10,bh=20;
+var bx=sx-Math.floor(bw/2);
+if(bx>cw-bw)bx=cw-bw;if(bx<0)bx=0;
+g.fillStyle='#323232';g.fillRect(bx,pB+2,bw,bh);
+g.fillStyle='#fff';g.fillText(sxl,bx+bw/2,pB+2+4);
+var syl=eok(mv)+'\uc5b5';
+var yw=g.measureText(syl).width+10;
+var yx=pL-2-yw;if(yx<0)yx=0;
+var yb=Math.round(ptr.y)-bh/2;
+if(yb>ch-bh)yb=ch-bh;if(yb<0)yb=0;
+g.fillStyle='#323232';g.fillRect(yx,yb,yw,bh);
+g.fillStyle='#fff';g.fillText(syl,yx+yw/2,yb+4);
+var l0=sxl;
+var l1=tL+': '+eok(D.l[ix])+'\uc5b5'+(D.li[ix]?' (\ubcf4\uc815)':'');
+var l2=tS+': '+eok(D.s[ix])+'\uc5b5'+(D.si[ix]?' (\ubcf4\uc815)':'');
+var tw=Math.max(g.measureText(l0).width,g.measureText(l1).width,g.measureText(l2).width)+12;
+var lh=16,th=lh*3+12;
+var tx=ptr.x+16,ty=ptr.y+16;
+if(tx+tw>cw-2)tx=ptr.x-16-tw;
+if(ty+th>ch-2)ty=ptr.y-16-th;
+if(tx<0)tx=0;if(ty<0)ty=0;
+tx=Math.round(tx);ty=Math.round(ty);
+g.fillStyle='#ffffe1';g.fillRect(tx,ty,tw,th);
+g.strokeStyle='#000';g.lineWidth=1;g.strokeRect(tx+0.5,ty+0.5,tw-1,th-1);
+g.textAlign='left';
+g.fillStyle='#000';g.fillText(l0,tx+6,ty+6);
+g.fillStyle='#0000ff';g.fillText(l1,tx+6,ty+6+lh);
+g.fillStyle='#ff0000';g.fillText(l2,tx+6,ty+6+lh*2);
+}
+}
+function pos(e){var r=cv.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top};}
+cv.addEventListener('mousemove',function(e){var p=pos(e);ptr.on=true;ptr.x=p.x;ptr.y=p.y;draw();});
+cv.addEventListener('mouseleave',function(){ptr.on=false;draw();});
+function tch(e){
+if(!e.touches||e.touches.length<1)return;
+var p=pos(e.touches[0]);
+if(inPlot(p.x,p.y)){ptr.on=true;ptr.x=p.x;ptr.y=p.y;if(e.cancelable)e.preventDefault();draw();}
+else if(e.type==='touchstart'){ptr.on=false;draw();}
+}
+cv.addEventListener('touchstart',tch,{passive:false});
+cv.addEventListener('touchmove',tch,{passive:false});
+window.addEventListener('resize',draw);
+draw();
+})();
+</script></body></html>
