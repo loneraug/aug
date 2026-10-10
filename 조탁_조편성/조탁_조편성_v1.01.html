@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>조탁 조편성 자동화 v1.01</title>
+<style>
+*{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{margin:0;font-family:'맑은 고딕','Malgun Gothic',sans-serif;background:#eef0f3;color:#1c2330}
+.ui{max-width:920px;margin:0 auto;padding:14px 16px}
+h1{font-size:20px;margin:0 0 10px}h1 small{font-size:12px;font-weight:normal;color:#667}
+.box{background:#fff;border:1px solid #cfd5de;border-radius:6px;padding:10px 12px;margin-bottom:10px}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+label{font-size:14px}
+input[type=number]{width:64px;font-size:15px;padding:3px 5px}
+textarea{width:100%;box-sizing:border-box;height:96px;font:15px 'Malgun Gothic',sans-serif;padding:6px}
+button{font:14px 'Malgun Gothic',sans-serif;padding:6px 14px;border:1px solid #2b4a7a;background:#fff;color:#2b4a7a;border-radius:4px;cursor:pointer}
+button.pri{background:#2b4a7a;color:#fff}button.on{background:#2b4a7a;color:#fff}
+#msg{color:#b3261e;font-size:14px;min-height:18px;margin:6px 0 0}
+#sum{font-size:13px;line-height:1.6;white-space:pre-wrap}
+.hint{font-size:12px;color:#667}
+#tabs{margin:0 0 8px;display:flex;gap:6px}
+#dlg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9}
+#dlg>div{background:#fff;max-width:460px;margin:60px auto;padding:14px;border-radius:6px}
+.pgw{margin:0 0 14px;padding:0 8px;overflow:hidden}.pgw.off{display:none}
+.pg{--s:var(--ss);position:relative;width:calc(var(--W)*var(--s)*1px);height:calc(var(--H)*var(--s)*1px);margin:0 auto;background:#fff;overflow:hidden;box-shadow:0 0 0 1px #cfd5de}
+.pg table{position:absolute;left:0;top:0;border-collapse:collapse;table-layout:fixed;width:calc(var(--W)*1px);zoom:var(--s)}
+td{border:1px solid #000;text-align:center;vertical-align:middle;font-weight:bold;padding:0;overflow:hidden;white-space:nowrap;font-size:11pt;line-height:1;outline:0}
+td:focus{background:#fff8c5}
+td.dh{background:repeating-linear-gradient(45deg,transparent 0 3px,#000 3px 4px)}
+td.ds{background:#000}td.nb{border:0}td.wr{white-space:pre-wrap}
+@page{size:A4 landscape;margin:8mm}
+@media print{
+ body{background:#fff}.ui{display:none}
+ .pgw,.pgw.off{display:block;margin:0;padding:0;overflow:visible;break-after:page}
+ .pgw:last-child{break-after:auto}
+ .pg{--s:var(--sp);box-shadow:none}
+ td:focus{background:none}td.ds:focus{background:#000}
+}
+</style></head><body>
+<div class="ui">
+<h1>조탁 조편성 자동화 <small>v1.01</small> <small style="margin-left:8px">2026년 4분기</small></h1>
+<div class="box">
+ <div class="row">
+  <label><input type="radio" name="mode" value="iron" checked> 철인리그</label>
+  <label><input type="radio" name="mode" value="sat"> 토요리그</label>
+  <label>인원 <input type="number" id="cnt" value="15" min="1"> 명</label>
+  <span class="hint" id="rng">철인 12~17명</span>
+ </div>
+ <p class="hint" style="margin:8px 0 4px">이름만 입력하세요 (공백, 쉼표, 줄바꿈으로 구분). 철인리그는 입력 순서대로 번호가 매겨집니다.</p>
+ <textarea id="names"></textarea>
+ <div class="row" style="margin-top:8px">
+  <button class="pri" id="bRun">조편성</button><button id="bClr">초기화</button>
+  <button id="bExc">배제 리스트</button><button id="bPrn">인쇄</button>
+  <span class="hint">인쇄: 배율 100%, 여백 기본으로 설정하세요 (A4 가로).</span>
+ </div>
+ <div id="msg"></div>
+</div>
+<div class="box" id="sumBox" style="display:none"><div id="sum"></div></div>
+<div id="tabs"></div>
+</div>
+<div id="stage"></div>
+<div id="dlg"><div>
+ <p style="margin:0 0 8px;font-size:14px">같은 조에 배치하지 않을 인원 쌍을 입력하세요 (한 줄에 한 쌍)<br>형식: 이름1,이름2</p>
+ <textarea id="exTxt"></textarea>
+ <div class="row" style="margin-top:8px"><button class="pri" id="exSave">저장</button><button id="exClose">닫기</button></div>
+</div></div>
+<script>
+const VER='1.01';
+const KEY='jotak_exclude_pairs_v1';
+const DEFAULT_PAIRS_B64='W1siXFx1YzZiMFxcdWM5MDBcXHVkNjM4IiwgIlxcdWJjMTVcXHVjYzJjXFx1YzZiMSJdXQ==';
+// ===== 명단 CSV (분기마다 신규 CSV 전체 내용으로 이 블록만 교체) =====
+const ROSTER_CSV=`이름,부수,참가횟수,메모
+강안수,5,0,
+강현아,8,0,
+강혜옥,8,0,
+강효정,9,0,
+구미경,9,0,
+금선희,7,0,
+금연덕,8,0,
+김건희,10,0,
+김계영,8,0,
+김동섭,7,0,
+김미란,9,0,
+김보규,6,0,
+김상범,6,0,신규
+김성식,5,0,
+김수영,8,0,
+김식이,6,0,
+김영애,9,0,신규
+김영지,9,0,신규
+김옥순,8,0,
+김용진,7,0,
+김용환,6,0,신규
+김은혜,8,0,
+김응희,6,0,
+김정옥,9,0,
+김정희,8,0,
+김준욱,7,0,
+김찬일,8,0,
+김태호,7,0,
+김형년,7,0,재가입
+김혜연,10,0,
+김호현,7,0,
+노경호,7,0,
+노영옥,9,0,신규
+노윤정,9,0,
+류지현,9,0,
+마인철,6,0,
+박규주,8,0,
+박명숙,7,0,
+박성근,8,0,
+박소연,7,0,
+박신영,9,0,
+박유순,8,0,
+박은영,9,0,
+박은정,9,0,
+박응수,6,0,
+박적호,7,0,
+박주일,8,0,
+박준규,6,0,
+배기범,7,0,신규
+배미숙,8,0,
+서대영,8,0,신규
+성영하,10,0,
+송귀숙,8,0,
+송기관,6,0,
+송민홍,7,0,
+송종화,7,0,
+신성련,10,0,신규
+신영철,6,0,
+신종대,7,0,신규
+안소연,7,0,
+안정자,7,0,
+안현중,6,0,
+안홍선,7,0,
+우주연,7,0,
+우준호,7,0,
+우희,9,0,재가입
+유승호,7,0,
+윤경숙,9,0,
+윤명숙,10,0,
+윤순동,9,0,
+윤영종,8,0,
+윤영준,7,0,
+이광호,5,0,신규
+이기형,5,0,
+이길순,7,0,재가입
+이대호,6,0,
+이례년,8,0,신규
+이미령,5,0,
+이선호,8,0,
+이섭우,6,0,
+이성자,9,0,
+이숙,9,0,
+이예인,9,0,
+이유정,9,0,
+이종숙,8,0,신규
+이창민,5,0,
+이현우,6,0,
+임성경,7,0,
+전성진,6,0,
+전성희,9,0,
+전찬범,7,0,신규
+정기원,6,0,신규
+정숙,9,0,신규
+정월희,9,0,
+정은희,8,0,
+정재현,10,0,신규
+정호경,8,0,
+조창용,7,0,
+주영원,6,0,
+지동진,7,0,
+채순식,7,0,
+최선열,8,0,
+최영선,7,0,
+최태진,9,0,
+추유호,6,0,
+한재형,6,0,
+홍기영,6,0,
+홍석형,8,0,
+황미령,9,0,
+황미애,9,0,
+황정현,5,0,`;
+// ===== 명단 CSV 끝 =====
+const POOL={
+ 12:{c:10.8,g:12.8,s:10.5,r:8.6,d:52.9,h3:42,l:44.65,t:20},
+ 13:{c:10.8,g:11.8,s:10.5,r:8.6,d:48,h3:42,l:44.65,t:20},
+ 14:{c:10.8,g:11.2,s:8.4,r:8.4,d:44.25,h3:42,l:44.65,t:20},
+ 15:{c:10.8,g:10.8,s:8.4,r:8.4,d:42,h3:42,l:44.65,t:20},
+ 16:{c:11.8,g:12.5,s:9.6,r:8.4,d:54,h3:54.75,l:50.25,t:22},
+ 17:{c:11.8,g:11.6,s:9.6,r:8.4,d:49.5,h3:49.5,l:50.25,t:22}};
+let memPairs='';
+let pages=[],curPage=0;
+const $=id=>document.getElementById(id);
+
+function parseRoster(t){const m=new Map();t.replace(/^\uFEFF/,'').split(/\r?\n/).slice(1).forEach(l=>{const p=l.split(',');const n=(p[0]||'').trim();const b=parseInt(p[1],10);if(n&&!isNaN(b))m.set(n,b);});return m;}
+function defaultPairs(){try{return JSON.parse(atob(DEFAULT_PAIRS_B64).replace(/\\\\/g,'\\')).map(p=>[p[0],p[1]]);}catch(e){return [];}}
+function loadUserText(){try{const v=localStorage.getItem(KEY);return v===null?memPairs:v;}catch(e){return memPairs;}}
+function saveUserText(t){memPairs=t;try{localStorage.setItem(KEY,t);}catch(e){}}
+function textToPairs(t){const r=[];t.split(/\r?\n/).forEach(l=>{const p=l.split(',');if(p.length>=2){const a=p[0].trim(),b=p[1].trim();if(a&&b)r.push([a,b]);}});return r;}
+function allPairs(){return defaultPairs().concat(textToPairs(loadUserText()));}
+const roster=parseRoster(ROSTER_CSV);
+
+function closest(arr,h){let best=-1,min=Infinity;arr.forEach((o,i)=>{const d=Math.abs(o.h-h);if(d<min){min=d;best=i;}});return best;}
+function swapPair(same,other,a,b){
+ const i1=same.findIndex(p=>p.name===a),i2=same.findIndex(p=>p.name===b);
+ if(i1<0||i2<0)return;
+ const p1=same[i1],p2=same[i2];
+ let k=other.findIndex(o=>o.h===p1.h);
+ if(k>=0){same[i1]=other[k];other[k]=p1;return;}
+ k=other.findIndex(o=>o.h===p2.h);
+ if(k>=0){same[i2]=other[k];other[k]=p2;return;}
+ k=closest(other,p1.h);
+ if(k>=0){same[i1]=other[k];other[k]=p1;return;}
+ k=closest(other,p2.h);
+ if(k>=0){same[i2]=other[k];other[k]=p2;return;}
+ if(other.length>0){same[i1]=other[0];other[0]=p1;}
+}
+function applyExclude(t1,t2){
+ for(const [a,b] of allPairs()){
+  const n1=t1.map(p=>p.name),n2=t2.map(p=>p.name);
+  const in1=n1.includes(a)&&n1.includes(b),in2=n2.includes(a)&&n2.includes(b);
+  if(!in1&&!in2)continue;
+  if(in1)swapPair(t1,t2,a,b);else swapPair(t2,t1,a,b);
+ }
+}
+function distribute(players){
+ const s=players.map((p,i)=>({p,i})).sort((x,y)=>x.p.h-y.p.h||x.i-y.i).map(x=>x.p);
+ const t1=[],t2=[];
+ s.forEach((p,i)=>{(i%2===0?t1:t2).push(p);});
+ applyExclude(t1,t2);
+ return [t1,t2];
+}
+function esc(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
+function cell(t,o){o=o||{};const a=['contenteditable="true"'];
+ if(o.cs>1)a.push('colspan="'+o.cs+'"');
+ if(o.fs)a.push('style="font-size:'+o.fs+'pt"');
+ const cl=((o.cls||'')+' '+(o.d||'')).trim();
+ if(cl)a.push('class="'+cl+'"');
+ if(o.sync)a.push('data-s="'+o.sync[0]+'" data-i="'+o.sync[1]+'" data-r="'+o.sync[2]+'"');
+ return '<td '+a.join(' ')+'>'+(o.raw?t:esc(t))+'</td>';}
+function tbl(cw,rh,rows){
+ const W=cw.reduce((a,b)=>a+b,0),H=rh.reduce((a,b)=>a+b,0);
+ const html='<table><colgroup>'+cw.map(w=>'<col style="width:'+w+'px">').join('')+'</colgroup>'+
+  rows.map((r,i)=>'<tr style="height:'+rh[i]+'px">'+r.join('')+'</tr>').join('')+'</table>';
+ return {W:W+2,H:H+2,html:html};}
+const cwpx=w=>Math.round(w*7+5);
+const today=()=>{const d=new Date();return (d.getMonth()+1)+'월 '+d.getDate()+'일';};
+
+function poolSheet(id,names){
+ const N=names.length,P=POOL[N],tot=N+4;
+ const cw=[cwpx(6),cwpx(P.c)].concat(Array(N).fill(cwpx(P.g)),[cwpx(P.s),cwpx(P.r)]);
+ const rh=[43.9,38.65,P.h3].concat(Array(N).fill(P.d),[P.l]).map(x=>x*4/3);
+ const rows=[];
+ rows.push([cell('제   회  일요철인리그  결과지',{cs:tot,fs:P.t})]);
+ const r2=[cell('<span style="display:inline-block;width:38px"></span>월<span style="display:inline-block;width:38px"></span>일',{cs:2,fs:16,raw:1})];
+ for(let j=0;j<N;j++)r2.push(cell(j+1,{fs:20}));
+ r2.push(cell('승점',{fs:16}),cell('순위',{fs:16}));rows.push(r2);
+ const r3=[cell('풀리그',{cs:2,fs:14})];
+ for(let j=0;j<N;j++)r3.push(cell(names[j],{fs:20,sync:[id,j,'c']}));
+ r3.push(cell(''),cell(''));rows.push(r3);
+ for(let i=0;i<N;i++){
+  const r=[cell(i+1,{fs:20}),cell(names[i],{fs:20,sync:[id,i,'r']})];
+  for(let j=0;j<N;j++)r.push(cell('',{fs:16,d:i===j?'dh':''}));
+  r.push(cell(''),cell(''));rows.push(r);
+ }
+ rows.push([cell('<찬조내역>',{cs:10,fs:14}),cell('<경기결과>\n금:                    은:                    동:',{cs:tot-10,fs:12,cls:'wr'})]);
+ return tbl(cw,rh,rows);
+}
+function teamSheet(id,label,names){
+ const N=names.length,tot=N+4,n12=(N===12);
+ const cw=(n12?[6.4,9].concat(Array(12).fill(9.6),[9.1,9.1]):[9,9].concat(Array(13).fill(9.1))).map(cwpx);
+ const rh=[21.75,31.5,n12?33:31.5].concat(Array(N).fill(n12?40.5:36),[14.25,21,21,21]).map(x=>x*4/3);
+ const rows=[];
+ rows.push([cell('조탁구나 조편성 및 리그결과지',{cs:tot,fs:20})]);
+ const r2=[cell('<span style="display:inline-block;width:'+(n12?36:44)+'px"></span>월<span style="display:inline-block;width:'+(n12?36:44)+'px"></span>일',{cs:2,fs:14,raw:1})];
+ for(let j=0;j<N;j++)r2.push(cell(j+1,{fs:16}));
+ r2.push(cell('승점',{fs:14}),cell('순위',{fs:14}));rows.push(r2);
+ const r3=[cell(label,{cs:2,fs:14})];
+ for(let j=0;j<N;j++)r3.push(cell(names[j],{fs:14,sync:[id,j,'c']}));
+ r3.push(cell(''),cell(''));rows.push(r3);
+ for(let i=0;i<N;i++){
+  const r=[cell(i+1,{fs:16}),cell(names[i],{fs:14,sync:[id,i,'r']})];
+  for(let j=0;j<N;j++)r.push(cell('',{d:i===j?'ds':''}));
+  r.push(cell(''),cell(''));rows.push(r);
+ }
+ rows.push([cell('',{cs:tot,cls:'nb'})]);
+ const hd=[],e1=[],e2=[];
+ for(let b=0;b<3;b++){
+  const ex=(n12&&b===2);
+  hd.push(cell('NO'),cell('찬조자'),cell('수량'));if(ex)hd.push(cell(''));hd.push(cell('찬조물품',{cs:2}));
+  e1.push(cell(b*2+1),cell(''),cell(''));if(ex)e1.push(cell(''));e1.push(cell('',{cs:2}));
+  e2.push(cell(b*2+2),cell(''),cell(''));if(ex)e2.push(cell(''));e2.push(cell('',{cs:2}));
+ }
+ rows.push(hd,e1,e2);
+ return tbl(cw,rh,rows);
+}
+function sync(td){
+ if(!td||!td.dataset||!td.dataset.s)return;
+ const o=td.dataset.r==='r'?'c':'r';
+ const t=document.querySelector('td[data-s="'+td.dataset.s+'"][data-i="'+td.dataset.i+'"][data-r="'+o+'"]');
+ if(t&&t.textContent!==td.textContent)t.textContent=td.textContent;
+}
+function fit(){
+ document.querySelectorAll('.pg').forEach(p=>{
+  const W=+p.dataset.w,H=+p.dataset.h;
+  p.style.setProperty('--W',W);p.style.setProperty('--H',H);
+  p.style.setProperty('--ss',Math.min(1,(document.documentElement.clientWidth-32)/W));
+  p.style.setProperty('--sp',Math.min(1047/W,718/H)*0.98);
+ });
+}
+function showPage(i){
+ curPage=i;
+ document.querySelectorAll('.pgw').forEach((w,k)=>w.classList.toggle('off',k!==i));
+ document.querySelectorAll('#tabs button').forEach((b,k)=>b.classList.toggle('on',k===i));
+}
+function render(){
+ $('stage').innerHTML=pages.map(p=>'<div class="pgw"><div class="pg" data-w="'+p.sheet.W+'" data-h="'+p.sheet.H+'">'+p.sheet.html+'</div></div>').join('');
+ $('tabs').innerHTML=pages.length>1?pages.map((p,i)=>'<button data-p="'+i+'">'+p.tab+'</button>').join(''):'';
+ fit();showPage(0);
+}
+function mode(){return document.querySelector('input[name=mode]:checked').value;}
+function setMode(){
+ const sat=mode()==='sat';
+ $('cnt').value=sat?22:15;
+ $('rng').textContent=sat?'토요 22명 또는 24명':'철인 12~17명';
+}
+function run(){
+ const msg=$('msg');msg.textContent='';
+ const names=$('names').value.split(/[,\s]+/).map(s=>s.trim()).filter(Boolean);
+ const cnt=parseInt($('cnt').value,10),sat=mode()==='sat';
+ if(!names.length){msg.textContent='참가자 이름을 입력하세요.';return;}
+ if(sat?(cnt!==22&&cnt!==24):!(cnt>=12&&cnt<=17)){msg.textContent=sat?'토요리그는 22명 또는 24명만 지원합니다.':'철인리그는 12~17명만 지원합니다.';return;}
+ if(names.length!==cnt){msg.textContent='입력한 이름은 '+names.length+'명인데 인원은 '+cnt+'명입니다.';return;}
+ const dup=names.filter((n,i)=>names.indexOf(n)!==i);
+ if(dup.length){msg.textContent='중복된 이름이 있습니다: '+[...new Set(dup)].join(', ');return;}
+ let sum='';
+ if(!sat){
+  pages=[{tab:'결과지',sheet:poolSheet('p0',names)}];
+  sum='철인리그 '+cnt+'명\n'+names.map((n,i)=>(i+1)+'. '+n).join('\n');
+ }else{
+  const reg=[],unk=[];
+  names.forEach(n=>{if(roster.has(n))reg.push({name:n,h:roster.get(n)});else unk.push(n);});
+  const [t1,t2]=distribute(reg);
+  const tm=[t1.map(p=>({name:p.name,h:p.h})),t2.map(p=>({name:p.name,h:p.h}))];
+  unk.forEach(n=>{const k=tm[0].length<=tm[1].length?0:1;tm[k].push({name:n,h:null});});
+  const sm=t=>t.reduce((a,p)=>a+(p.h||0),0);
+  pages=tm.map((t,k)=>({tab:'페이지 '+(k+1)+' ('+(k+1)+'조)',sheet:teamSheet('t'+k,(k+1)+'조',t.map(p=>p.name))}));
+  sum=tm.map((t,k)=>'=== '+(k+1)+'조 ('+t.length+'명) - 총 부수: '+sm(t)+' ===\n'+t.map((p,i)=>(i+1)+'. '+p.name+' ('+(p.h===null?'명단 외':'부수: '+p.h)+')').join('\n')).join('\n\n');
+ }
+ render();$('sum').textContent=sum;$('sumBox').style.display='block';
+}
+function clearAll(){
+ $('names').value='';$('msg').textContent='';$('stage').innerHTML='';$('tabs').innerHTML='';
+ $('sum').textContent='';$('sumBox').style.display='none';pages=[];
+}
+document.querySelectorAll('input[name=mode]').forEach(r=>r.addEventListener('change',setMode));
+$('bRun').addEventListener('click',run);
+$('bClr').addEventListener('click',clearAll);
+$('bPrn').addEventListener('click',()=>{if(!pages.length){$('msg').textContent='먼저 조편성을 실행하세요.';return;}fit();window.print();});
+$('tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(b)showPage(+b.dataset.p);});
+$('bExc').addEventListener('click',()=>{$('exTxt').value=loadUserText();$('dlg').style.display='block';});
+$('exClose').addEventListener('click',()=>{$('dlg').style.display='none';});
+$('exSave').addEventListener('click',()=>{saveUserText($('exTxt').value.trim());$('dlg').style.display='none';});
+const stage=$('stage');
+stage.addEventListener('input',e=>{if(!e.isComposing)sync(e.target.closest('td'));});
+stage.addEventListener('compositionend',e=>sync(e.target.closest('td')));
+stage.addEventListener('focusout',e=>sync(e.target.closest&&e.target.closest('td')));
+stage.addEventListener('keydown',e=>{if(e.key==='Enter')e.preventDefault();});
+stage.addEventListener('paste',e=>{e.preventDefault();const t=(e.clipboardData||window.clipboardData).getData('text/plain').replace(/[\r\n]+/g,' ');document.execCommand('insertText',false,t);});
+window.addEventListener('resize',fit);
+window.addEventListener('beforeprint',fit);
+</script></body></html>
