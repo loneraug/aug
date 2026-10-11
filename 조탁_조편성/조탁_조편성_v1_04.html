@@ -57,7 +57,7 @@ td.sel,td.sel:focus{outline:3px solid #d9480f;outline-offset:-3px;background:#ff
  <p class="hint" style="margin:8px 0 4px">이름만 입력하세요 (공백, 쉼표, 줄바꿈으로 구분). 철인리그는 입력 순서대로 번호가 매겨집니다.</p>
  <textarea id="names"></textarea>
  <div class="row" style="margin-top:8px">
-  <button class="pri" id="bRun" title="입력한 이름으로 조편성을 실행합니다. 철인리그는 입력 순서대로 번호를 매겨 결과지와 대진표를 만들고, 토요리그는 부수 순으로 1조·2조로 나눕니다(배제 리스트 반영). 조편성 내보내기 형식의 텍스트가 입력되어 있으면 그 조편성을 그대로 복원합니다.">조편성</button><button id="bClr" title="입력한 이름과 조편성 결과(결과지·대진표·요약)를 모두 지우고, 현재 모드의 빈 결과지/대진표 상태로 되돌립니다.">초기화</button>
+  <button class="pri" id="bRun" title="입력한 이름으로 조편성을 실행합니다. 철인리그는 입력 순서대로 번호를 매겨 결과지와 대진표를 만들고, 토요리그는 부수 순으로 1조·2조로 나눕니다(배제 리스트 반영). 조편성 내보내기 형식의 텍스트가 입력되어 있으면 그 조편성을 그대로 복원합니다. 인원이 모자라면 확인 후 모자라는 인원을 빈칸으로 두고 조편성할 수 있습니다.">조편성</button><button id="bClr" title="입력한 이름과 조편성 결과(결과지·대진표·요약)를 모두 지우고, 현재 모드의 빈 결과지/대진표 상태로 되돌립니다.">초기화</button>
   <button id="bExc" title="같은 조에 배치하지 않을 인원 쌍을 등록하는 창을 엽니다(한 줄에 '이름1,이름2'). 토요리그 조편성에 적용되며, 기본 내장 쌍에 더해 직접 입력한 쌍이 반영됩니다.">배제 리스트</button>
   <button id="bExp" title="현재 조편성 결과(조별 명단과 부수, 철인리그는 번호 순서)를 txt 파일로 저장합니다. 저장한 txt 파일을 화면 아무 곳에나 드래그앤드랍하거나 이름 입력란에 내용을 복사해 붙여넣으면 같은 조편성이 자동으로 복원됩니다(철인/토요 모드와 인원은 자동 인식).">조편성 내보내기</button>
   <span style="font-size:14px">인쇄: <button id="bPrn" title="모든 페이지를 한 번에 인쇄합니다. 철인리그는 페이지 1(가로)과 페이지 2(세로)의 용지 방향이 달라 크롬/엣지를 권장합니다.">전체</button> <button id="bPr1" title="1 페이지만 인쇄합니다(철인리그: 결과지 A4 가로, 토요리그: 1조 A4 가로).">1 페이지</button> <button id="bPr2" title="2 페이지만 인쇄합니다(철인리그: 대진표 A4 세로, 토요리그: 2조 A4 가로).">2 페이지</button></span>
@@ -451,16 +451,29 @@ function importText(text,src){
   $('names').value=text;run();
  }else if(src==='drop'){$('names').value=text;$('msg').textContent='';}
 }
+function fillTarget(n,cnt,sat){
+ const T=(sat?[22,24]:[12,13,14,15,16,17]).find(v=>v>=cnt);
+ return T&&n<T?T:0;
+}
+function askFill(names,T){
+ const dup=names.filter((n,i)=>names.indexOf(n)!==i);
+ if(dup.length){$('msg').textContent='중복된 이름이 있습니다: '+[...new Set(dup)].join(', ');return 0;}
+ const m=T-names.length;
+ if(!confirm($('msg').textContent+'\n\n모자라는 인원을 빈칸으로 작성합니까?\n(모자라는 '+m+'명은 마지막 번호에 빈칸으로 배치됩니다. 토요리그는 두 조에 균등 배분됩니다.)'))return 0;
+ $('msg').textContent='';$('cnt').value=T;return m;
+}
 function run(){
  const msg=$('msg');msg.textContent='';
  const imp=parseExport($('names').value);if(imp){runImport(imp);return;}
  const names=$('names').value.split(/[,\s]+/).map(s=>s.trim()).filter(Boolean);
  const cnt=parseInt($('cnt').value,10),sat=mode()==='sat';
  if(!names.length){msg.textContent='참가자 이름을 입력하세요.';return;}
- if(sat?(cnt!==22&&cnt!==24):!(cnt>=12&&cnt<=17)){msg.textContent=sat?'토요리그는 22명 또는 24명만 지원합니다.':'철인리그는 12~17명만 지원합니다.';return;}
- if(names.length!==cnt){msg.textContent='입력한 이름은 '+names.length+'명인데 인원은 '+cnt+'명입니다.';return;}
+ let pad=0;
+ if(sat?(cnt!==22&&cnt!==24):!(cnt>=12&&cnt<=17)){msg.textContent=sat?'토요리그는 22명 또는 24명만 지원합니다.':'철인리그는 12~17명만 지원합니다.';const T=fillTarget(names.length,cnt,sat);if(!T||!(pad=askFill(names,T)))return;}
+ else if(names.length!==cnt){msg.textContent='입력한 이름은 '+names.length+'명인데 인원은 '+cnt+'명입니다.';const T=fillTarget(names.length,cnt,sat);if(!T||!(pad=askFill(names,T)))return;}
  const dup=names.filter((n,i)=>names.indexOf(n)!==i);
  if(dup.length){msg.textContent='중복된 이름이 있습니다: '+[...new Set(dup)].join(', ');return;}
+ if(pad)names.push(...Array(pad).fill(''));
  let sum='';
  if(!sat){
   pages=[{tab:'페이지 1 (결과지)',sheet:poolSheet('p0',names)},{tab:'페이지 2 (대진표)',sheet:bracketSheet(names.length),orient:'p'}];
@@ -476,6 +489,7 @@ function run(){
   sum=tm.map((t,k)=>'=== '+(k+1)+'조 ('+t.length+'명) - 총 부수: '+sm(t)+' ===\n'+t.map((p,i)=>(i+1)+'. '+p.name+' ('+(p.h===null?'명단 외':'부수: '+p.h)+')').join('\n')).join('\n\n');
  }
  render();$('sum').textContent=sum;$('sumBox').style.display='block';
+ if(pad)updateSummary();
 }
 function clearAll(){
  $('names').value='';$('msg').textContent='';$('stage').innerHTML='';$('tabs').innerHTML='';
