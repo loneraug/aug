@@ -264,7 +264,7 @@ function poolSheet(id,names){
  const cw=[cwpx(6),cwpx(P.c)].concat(Array(N).fill(cwpx(P.g)),[cwpx(P.s),cwpx(P.r)]);
  const rh=[43.9,38.65,P.h3].concat(Array(N).fill(P.d),[P.l]).map(x=>x*4/3);
  const rows=[];
- rows.push([cell('제   회  일요철인리그  결과지',{cs:tot,fs:P.t})]);
+ rows.push([cell('   회  일요철인리그  결과지',{cs:tot,fs:P.t})]);
  const r2=[cell('<span style="display:inline-block;width:38px"></span>월<span style="display:inline-block;width:38px"></span>일',{cs:2,fs:16,raw:1})];
  for(let j=0;j<N;j++)r2.push(cell(j+1,{fs:20}));
  r2.push(cell('승점',{fs:16}),cell('순위',{fs:16}));rows.push(r2);
