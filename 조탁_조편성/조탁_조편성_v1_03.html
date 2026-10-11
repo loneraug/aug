@@ -52,6 +52,7 @@ td.sel,td.sel:focus{outline:3px solid #d9480f;outline-offset:-3px;background:#ff
   <label><input type="radio" name="mode" value="sat"> 토요리그</label>
   <label>인원 <input type="number" id="cnt" value="15" min="1"> 명</label>
   <span class="hint" id="rng">철인 12~17명</span>
+  <button id="bRnd" title="테스트용 기능입니다. 내장 명단에서 인원수만큼 무작위로 입력합니다(부수별 최소 1명 포함).">참가자 무작위</button>
  </div>
  <p class="hint" style="margin:8px 0 4px">이름만 입력하세요 (공백, 쉼표, 줄바꿈으로 구분). 철인리그는 입력 순서대로 번호가 매겨집니다.</p>
  <textarea id="names"></textarea>
@@ -371,6 +372,21 @@ function setMode(){
  $('cnt').value=sat?22:15;
  $('rng').textContent=sat?'토요 22명 또는 24명':'철인 12~17명';
 }
+function randomFill(){
+ const msg=$('msg');msg.textContent='';
+ const cnt=parseInt($('cnt').value,10),sat=mode()==='sat';
+ if(sat?(cnt!==22&&cnt!==24):!(cnt>=12&&cnt<=17)){msg.textContent=sat?'토요리그는 22명 또는 24명만 지원합니다.':'철인리그는 12~17명만 지원합니다.';return;}
+ const g=new Map();
+ roster.forEach((b,n)=>{if(!g.has(b))g.set(b,[]);g.get(b).push(n);});
+ if(cnt<g.size){msg.textContent='부수가 '+g.size+'종이라 인원은 '+g.size+'명 이상이어야 합니다.';return;}
+ if(cnt>roster.size){msg.textContent='내장 명단 인원('+roster.size+'명)보다 많습니다.';return;}
+ const rnd=a=>a.splice(Math.floor(Math.random()*a.length),1)[0];
+ const pick=[],rest=[];
+ g.forEach(a=>{const c=a.slice();pick.push(rnd(c));c.forEach(n=>rest.push(n));});
+ while(pick.length<cnt)pick.push(rnd(rest));
+ for(let i=pick.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pick[i],pick[j]]=[pick[j],pick[i]];}
+ $('names').value=pick.join(', ');
+}
 function run(){
  const msg=$('msg');msg.textContent='';
  const names=$('names').value.split(/[,\s]+/).map(s=>s.trim()).filter(Boolean);
@@ -478,6 +494,7 @@ $('bClr').addEventListener('click',clearAll);
 $('bPrn').addEventListener('click',()=>{if(!pages.length){$('msg').textContent='먼저 조편성을 실행하세요.';return;}fit();window.print();});
 $('bPr1').addEventListener('click',()=>printOne(0));
 $('bPr2').addEventListener('click',()=>printOne(1));
+$('bRnd').addEventListener('click',randomFill);
 $('tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(b)showPage(+b.dataset.p);});
 $('bExc').addEventListener('click',()=>{$('exTxt').value=loadUserText();$('dlg').style.display='block';});
 $('exClose').addEventListener('click',()=>{$('dlg').style.display='none';});
