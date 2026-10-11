@@ -57,7 +57,7 @@ td.sel,td.sel:focus{outline:3px solid #d9480f;outline-offset:-3px;background:#ff
  <p class="hint" style="margin:8px 0 4px">이름만 입력하세요 (공백, 쉼표, 줄바꿈으로 구분). 철인리그는 입력 순서대로 번호가 매겨집니다.</p>
  <textarea id="names"></textarea>
  <div class="row" style="margin-top:8px">
-  <button class="pri" id="bRun" title="입력한 이름으로 조편성을 실행합니다. 철인리그는 입력 순서대로 번호를 매겨 결과지와 대진표를 만들고, 토요리그는 부수 순으로 1조·2조로 나눕니다(배제 리스트 반영). 조편성 내보내기 형식의 텍스트가 입력되어 있으면 그 조편성을 그대로 복원합니다.">조편성</button><button id="bClr" title="입력한 이름과 조편성 결과(결과지·대진표·요약)를 모두 지우고 처음 상태로 되돌립니다.">초기화</button>
+  <button class="pri" id="bRun" title="입력한 이름으로 조편성을 실행합니다. 철인리그는 입력 순서대로 번호를 매겨 결과지와 대진표를 만들고, 토요리그는 부수 순으로 1조·2조로 나눕니다(배제 리스트 반영). 조편성 내보내기 형식의 텍스트가 입력되어 있으면 그 조편성을 그대로 복원합니다.">조편성</button><button id="bClr" title="입력한 이름과 조편성 결과(결과지·대진표·요약)를 모두 지우고, 현재 모드의 빈 결과지/대진표 상태로 되돌립니다.">초기화</button>
   <button id="bExc" title="같은 조에 배치하지 않을 인원 쌍을 등록하는 창을 엽니다(한 줄에 '이름1,이름2'). 토요리그 조편성에 적용되며, 기본 내장 쌍에 더해 직접 입력한 쌍이 반영됩니다.">배제 리스트</button>
   <button id="bExp" title="현재 조편성 결과(조별 명단과 부수, 철인리그는 번호 순서)를 txt 파일로 저장합니다. 저장한 txt 파일을 화면 아무 곳에나 드래그앤드랍하거나 이름 입력란에 내용을 복사해 붙여넣으면 같은 조편성이 자동으로 복원됩니다(철인/토요 모드와 인원은 자동 인식).">조편성 내보내기</button>
   <span style="font-size:14px">인쇄: <button id="bPrn" title="모든 페이지를 한 번에 인쇄합니다. 철인리그는 페이지 1(가로)과 페이지 2(세로)의 용지 방향이 달라 크롬/엣지를 권장합니다.">전체</button> <button id="bPr1" title="1 페이지만 인쇄합니다(철인리그: 결과지 A4 가로, 토요리그: 1조 A4 가로).">1 페이지</button> <button id="bPr2" title="2 페이지만 인쇄합니다(철인리그: 대진표 A4 세로, 토요리그: 2조 A4 가로).">2 페이지</button></span>
@@ -347,6 +347,7 @@ function sync(td){
  const t=document.querySelector('td[data-s="'+td.dataset.s+'"][data-i="'+td.dataset.i+'"][data-r="'+o+'"]');
  if(t&&t.textContent!==td.textContent)t.textContent=td.textContent;
  refreshBracket();
+ updateSummary();
 }
 function fit(){
  document.querySelectorAll('.pg').forEach(p=>{
@@ -372,6 +373,16 @@ function setMode(){
  const sat=mode()==='sat';
  $('cnt').value=sat?22:15;
  $('rng').textContent=sat?'토요 22명 또는 24명':'철인 12~17명';
+ showBlank();
+}
+function hasNames(){return [...document.querySelectorAll('td[data-s][data-r="r"]')].some(t=>t.textContent.trim());}
+function showBlank(){
+ const sat=mode()==='sat',n=parseInt($('cnt').value,10);
+ if(sat?(n!==22&&n!==24):!(n>=12&&n<=17))return;
+ if(hasNames())return;
+ const e=k=>Array(k).fill('');
+ pages=sat?[0,1].map(k=>({tab:'페이지 '+(k+1)+' ('+(k+1)+'조)',sheet:teamSheet('t'+k,(k+1)+'조',e(n/2))})):[{tab:'페이지 1 (결과지)',sheet:poolSheet('p0',e(n))},{tab:'페이지 2 (대진표)',sheet:bracketSheet(n),orient:'p'}];
+ render();updateSummary();$('sumBox').style.display='block';
 }
 function randomFill(){
  const msg=$('msg');msg.textContent='';
@@ -389,7 +400,7 @@ function randomFill(){
  $('names').value=pick.join(', ');
 }
 function exportPlan(){
- if(!pages.length){$('msg').textContent='먼저 조편성을 실행하세요.';return;}
+ if(!hasNames()){$('msg').textContent='내보낼 이름이 없습니다. 조편성을 실행하거나 결과지에 이름을 입력하세요.';return;}
  updateSummary();
  const text=$('sum').textContent;
  const d=new Date(),p2=n=>String(n).padStart(2,'0');
@@ -436,7 +447,7 @@ function runImport(imp){
 function importText(text,src){
  const imp=parseExport(text);
  if(imp){
-  if(pages.length&&!confirm('이미 조편성 결과가 있습니다. 가져온 조편성으로 덮어쓰시겠습니까?\n(결과지에 직접 입력한 내용은 사라집니다.)'))return;
+  if(hasNames()&&!confirm('이미 조편성 결과가 있습니다. 가져온 조편성으로 덮어쓰시겠습니까?\n(결과지에 직접 입력한 내용은 사라집니다.)'))return;
   $('names').value=text;run();
  }else if(src==='drop'){$('names').value=text;$('msg').textContent='';}
 }
@@ -469,6 +480,7 @@ function run(){
 function clearAll(){
  $('names').value='';$('msg').textContent='';$('stage').innerHTML='';$('tabs').innerHTML='';
  $('sum').textContent='';$('sumBox').style.display='none';pages=[];clearSel();
+ showBlank();
 }
 let sel=[];
 function selTd(s,i,r){return document.querySelector('td[data-s="'+s+'"][data-i="'+i+'"][data-r="'+r+'"]');}
@@ -513,10 +525,10 @@ function updateSummary(){
  const names=id=>[...document.querySelectorAll('td[data-s="'+id+'"][data-r="r"]')].map(t=>t.textContent.trim());
  const ids=[...new Set([...document.querySelectorAll('td[data-s]')].map(t=>t.dataset.s))];
  let sum='';
- if(ids.length===1){const n=names(ids[0]);sum='철인리그 '+n.length+'명\n'+n.map((x,i)=>(i+1)+'. '+x).join('\n');}
+ if(ids.length===1){const n=names(ids[0]);sum='철인리그 '+n.filter(Boolean).length+'명\n'+n.map((x,i)=>(i+1)+'. '+x).join('\n');}
  else sum=ids.map((id,k)=>{const n=names(id);const h=x=>roster.has(x)?roster.get(x):null;
   const tot=n.reduce((a,x)=>a+(h(x)||0),0);
-  return '=== '+(k+1)+'조 ('+n.length+'명) - 총 부수: '+tot+' ===\n'+n.map((x,i)=>(i+1)+'. '+x+' ('+(h(x)===null?'명단 외':'부수: '+h(x))+')').join('\n');}).join('\n\n');
+  return '=== '+(k+1)+'조 ('+n.filter(Boolean).length+'명) - 총 부수: '+tot+' ===\n'+n.map((x,i)=>(i+1)+'. '+x+(x?' ('+(h(x)===null?'명단 외':'부수: '+h(x))+')':'')).join('\n');}).join('\n\n');
  $('sum').textContent=sum;
 }
 function doSwap(){
@@ -543,6 +555,7 @@ function endPrintOne(){
  const st=$('pgStyle');if(st)st.remove();
 }
 document.querySelectorAll('input[name=mode]').forEach(r=>r.addEventListener('change',setMode));
+$('cnt').addEventListener('change',showBlank);
 $('bRun').addEventListener('click',run);
 $('bClr').addEventListener('click',clearAll);
 $('bPrn').addEventListener('click',()=>{if(!pages.length){$('msg').textContent='먼저 조편성을 실행하세요.';return;}fit();window.print();});
@@ -582,4 +595,5 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&sel.length)clearSel
 window.addEventListener('resize',drawLine);
 window.addEventListener('beforeprint',fit);
 window.addEventListener('afterprint',endPrintOne);
+showBlank();
 </script></body></html>
