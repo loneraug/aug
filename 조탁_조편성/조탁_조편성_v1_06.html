@@ -289,7 +289,7 @@ function poolSheet(id,names){
  r3.push(cell(''),cell(''));rows.push(r3);
  for(let i=0;i<N;i++){
   const r=[cell(i+1,{fs:20}),cell(names[i],{fs:20,sync:[id,i,'r']})];
-  for(let j=0;j<N;j++)r.push(cell('',{fs:16,d:i===j?'dh':''}));
+  for(let j=0;j<N;j++)r.push(cell('',{fs:16,d:i===j?'ds':''}));
   r.push(cell(''),cell(''));rows.push(r);
  }
  const u=3,Lc=Math.ceil(tot/2),Lu=Lc*u,R=tot-Lc;
