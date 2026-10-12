@@ -256,11 +256,21 @@ function cell(t,o){o=o||{};const a=o.ro?[]:['contenteditable="true"'];
  if(o.sync)a.push('data-s="'+o.sync[0]+'" data-i="'+o.sync[1]+'" data-r="'+o.sync[2]+'"');
  if(o.b!==undefined)a.push('data-b="'+o.b+'"');
  return '<td '+a.join(' ')+'>'+(o.raw?t:esc(t))+'</td>';}
-function tbl(cw,rh,rows){
+function tbl(cw,rh,rows,u,keep){
  const W=cw.reduce((a,b)=>a+b,0),H=rh.reduce((a,b)=>a+b,0);
+ if(u>1){cw=[].concat(...cw.map(w=>Array(u).fill(w/u)));
+  rows=rows.map((r,i)=>i<rows.length-keep?r.map(t=>t.replace(/^<td ([^>]*)>/,(m,a)=>{const x=/colspan="(\d+)"/.exec(a);return x?'<td '+a.replace(x[0],'colspan="'+x[1]*u+'"')+'>':'<td colspan="'+u+'" '+a+'>';})):r);}
  const html='<table><colgroup>'+cw.map(w=>'<col style="width:'+w+'px">').join('')+'</colgroup>'+
   rows.map((r,i)=>'<tr style="height:'+rh[i]+'px">'+r.join('')+'</tr>').join('')+'</table>';
  return {W:W+2,H:H+2,html:html};}
+function payLay(ew,s,e){
+ const tk=(a,b,px)=>{let c=0,w=0;while(a+c<b&&w<px){w+=ew[a+c];c++;}return c;};
+ const tr=(a,b,px)=>{let c=0,w=0;while(b-c>a&&w<px){w+=ew[b-1-c];c++;}return c;};
+ const no=tk(s,e,28),qt=tr(s+no,e,38),nm=tk(s+no,e-qt,66);
+ return [no,nm,e-s-no-nm-qt,qt];
+}
+const payHdr=l=>[cell('NO',{cs:l[0],fs:12}),cell('찬조자',{cs:l[1],fs:12}),cell('찬조물품',{cs:l[2],fs:12}),cell('수량',{cs:l[3],fs:12})];
+const payDat=(l,n)=>[cell(n,{cs:l[0]}),cell('',{cs:l[1]}),cell('',{cs:l[2]}),cell('',{cs:l[3]})];
 const cwpx=w=>Math.round(w*7+5);
 const today=()=>{const d=new Date();return (d.getMonth()+1)+'월 '+d.getDate()+'일';};
 
@@ -281,15 +291,15 @@ function poolSheet(id,names){
   for(let j=0;j<N;j++)r.push(cell('',{fs:16,d:i===j?'dh':''}));
   r.push(cell(''),cell(''));rows.push(r);
  }
- const L=Math.ceil(tot/2),R=tot-L,kA=Math.floor(L/2),kB=L-kA;
- const sp=k=>{const r=k-2;return [Math.ceil(r/2),Math.floor(r/2)];};
- const hdr=k=>{const q=sp(k);return [cell('NO',{fs:12}),cell('찬조자',{cs:q[0],fs:12}),cell('수량',{fs:12}),cell('찬조물품',{cs:q[1],fs:12})];};
- const dat=(k,n)=>{const q=sp(k);return [cell(n),cell('',{cs:q[0]}),cell(''),cell('',{cs:q[1]})];};
- const pz=['금:','은:','동:'].map((t,j)=>cell(t,{cs:Math.floor(R/3)+(j<R%3?1:0),rs:3,fs:12,cls:'al'+(j<2?' nr':'')+(j>0?' nl':'')}));
- rows.push(hdr(kA).concat(hdr(kB),pz));
- rows.push(dat(kA,1).concat(dat(kB,3)));
- rows.push(dat(kA,2).concat(dat(kB,4)));
- return tbl(cw,rh,rows);
+ const u=3,Lc=Math.ceil(tot/2),Lu=Lc*u,R=tot-Lc;
+ const ew=[].concat(...cw.map(w=>Array(u).fill(w/u)));
+ const tl=ew.slice(0,Lu).reduce((x,y)=>x+y,0);let bu=0,acc=0;while(bu<Lu&&acc+ew[bu]/2<tl/2){acc+=ew[bu];bu++;}
+ const lA=payLay(ew,0,bu),lB=payLay(ew,bu,Lu);
+ const pz=['금:','은:','동:'].map((t,j)=>cell(t,{cs:R,rs:2,fs:12,cls:'al'+(j<2?' nr':'')+(j>0?' nl':'')}));
+ rows.push(payHdr(lA).concat(payHdr(lB),[cell('경기결과',{cs:R*3,fs:12})]));
+ rows.push(payDat(lA,1).concat(payDat(lB,3),pz));
+ rows.push(payDat(lA,2).concat(payDat(lB,4)));
+ return tbl(cw,rh,rows,u,3);
 }
 function teamSheet(id,label,names){
  const N=names.length,tot=N+4,n12=(N===12);
@@ -309,15 +319,13 @@ function teamSheet(id,label,names){
   r.push(cell(''),cell(''));rows.push(r);
  }
  rows.push([cell('',{cs:tot,cls:'nb'})]);
- const hd=[],e1=[],e2=[];
- for(let b=0;b<3;b++){
-  const ex=(n12&&b===2);
-  hd.push(cell('NO'),cell('찬조자'),cell('수량'));if(ex)hd.push(cell(''));hd.push(cell('찬조물품',{cs:2}));
-  e1.push(cell(b*2+1),cell(''),cell(''));if(ex)e1.push(cell(''));e1.push(cell('',{cs:2}));
-  e2.push(cell(b*2+2),cell(''),cell(''));if(ex)e2.push(cell(''));e2.push(cell('',{cs:2}));
+ const hd=[],e1=[],e2=[],u=3,ew=[].concat(...cw.map(w=>Array(u).fill(w/u)));
+ for(let b=0,st=0;b<3;b++){
+  const en=st+((n12&&b===2)?6:5)*u,l=payLay(ew,st,en);st=en;
+  hd.push(...payHdr(l));e1.push(...payDat(l,b*2+1));e2.push(...payDat(l,b*2+2));
  }
  rows.push(hd,e1,e2);
- return tbl(cw,rh,rows);
+ return tbl(cw,rh,rows,u,3);
 }
 function bracketRounds(N){
  const M=N%2?N+1:N,h=M/2,fx=N%2?'X':1;
