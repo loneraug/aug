@@ -744,6 +744,7 @@ function runImport(imp){
   sum=tm.map((t,k)=>'=== '+(k+1)+'조 ('+t.length+'명) - 총 부수: '+sm(t)+' ===\n'+t.map((p,i)=>(i+1)+'. '+p.name+' ('+(p.h===null?'명단 외':'부수: '+p.h)+')').join('\n')).join('\n\n');
  }
  render();$('sum').textContent=sum;$('sumBox').style.display='block';
+ $('names').value=all.join(', ');
 }
 function importText(text,src){
  const imp=parseExport(text);
