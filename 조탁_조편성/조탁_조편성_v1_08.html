@@ -102,7 +102,7 @@ td.sel,td.sel:focus{outline:3px solid #d9480f;outline-offset:-3px;background:#ff
   <div class="row" style="margin-top:6px">
    <button id="mAdd" title="표 맨 아래에 빈 행을 추가합니다.">행 추가</button>
    <button id="mDel" title="체크한 행을 삭제합니다. 삭제 전에 확인 창이 나옵니다.">선택행 삭제</button>
-   <button id="mInc" title="현재 조편성에 입력된 이름 중 표에 있는 인원의 참가횟수를 1회씩 증가시킵니다. 저장해야 시트에 반영됩니다.">입력된 명단 참가횟수 1회 증가</button>
+   <button id="mInc" title="명단 입력란에 입력된 이름 중 표에 있는 인원의 참가횟수를 1회씩 증가시킵니다. 저장해야 시트에 반영됩니다.">입력된 명단 참가횟수 1회 증가</button>
    <button id="mZero" title="표의 모든 행의 참가횟수를 0으로 만듭니다. 저장해야 시트에 반영됩니다.">참가횟수 초기화</button>
   </div>
   <div id="mWarn"></div>
@@ -377,8 +377,10 @@ function memDelSel(){
 }
 function memInc(){
  if(memSaving)return;
- const names=[...new Set([...document.querySelectorAll('td[data-s][data-r="r"]')].map(t=>t.textContent.trim()).filter(Boolean))];
- if(!names.length){memGuide('현재 조편성에 입력된 이름이 없습니다.');return;}
+ const imp=parseExport($('names').value);
+ const src=imp?[].concat(...imp.groups):$('names').value.split(/[,\s]+/);
+ const names=[...new Set(src.map(t=>t.trim()).filter(Boolean))];
+ if(!names.length){memGuide('명단 입력란에 입력된 이름이 없습니다.');return;}
  const map=new Map();
  document.querySelectorAll('#mBody tr').forEach(tr=>{const n=tr.querySelector('.c0').value.trim();if(n&&!map.has(n))map.set(n,tr);});
  const hit=names.filter(n=>map.has(n)),skip=names.length-hit.length;
