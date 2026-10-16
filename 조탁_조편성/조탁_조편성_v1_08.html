@@ -523,12 +523,35 @@ function applyExclude(t1,t2){
   if(in1)swapPair(t1,t2,a,b);else swapPair(t2,t1,a,b);
  }
 }
+let excViol=[];
 function distribute(players){
- const s=players.map((p,i)=>({p,i})).sort((x,y)=>x.p.h-y.p.h||x.i-y.i).map(x=>x.p);
- const t1=[],t2=[];
- s.forEach((p,i)=>{(i%2===0?t1:t2).push(p);});
- applyExclude(t1,t2);
- return [t1,t2];
+ const pn=new Set(players.map(p=>p.name)),pr0=allPairs().filter(([a,b])=>a!==b&&pn.has(a)&&pn.has(b));
+ let best=null,bc=Infinity,bv=[];
+ for(let r=0;r<(pr0.length?150:1);r++){
+  const s=players.map(p=>({p,k:Math.random()})).sort((x,y)=>x.p.h-y.p.h||x.k-y.k).map(x=>x.p);
+  const ix=new Map(s.map((p,i)=>[p.name,i])),pr=pr0.map(([a,b])=>[ix.get(a),ix.get(b)]);
+  const tm=s.map((p,i)=>i%2);
+  const cost=()=>{
+   let v=0;pr.forEach(([a,b])=>{if(tm[a]===tm[b])v++;});
+   const d=new Map();let sd=0;
+   s.forEach((p,i)=>{const g=tm[i]?1:-1;d.set(p.h,(d.get(p.h)||0)+g);sd+=g*p.h;});
+   let dist=0;d.forEach(x=>{dist+=Math.abs(x);});
+   return v*1e6+dist*1000+Math.abs(sd);
+  };
+  let cur=cost();
+  for(;;){
+   let bcs=cur,bi=-1,bj=-1,cnt=0;
+   for(let i=0;i<s.length;i++)if(tm[i]===0)for(let j=0;j<s.length;j++)if(tm[j]===1){
+    tm[i]=1;tm[j]=0;const c=cost();tm[i]=0;tm[j]=1;
+    if(c<bcs){bcs=c;bi=i;bj=j;cnt=1;}else if(c===bcs&&bi>=0&&Math.random()*(++cnt)<1){bi=i;bj=j;}
+   }
+   if(bi<0)break;
+   tm[bi]=1;tm[bj]=0;cur=bcs;
+  }
+  if(cur<=bc){bc=cur;best=[s.filter((p,i)=>tm[i]===0),s.filter((p,i)=>tm[i]===1)];bv=pr0.filter(([a,b])=>tm[ix.get(a)]===tm[ix.get(b)]);}
+ }
+ excViol=bv;
+ return best;
 }
 function esc(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
 function cell(t,o){o=o||{};const a=o.ro?[]:['contenteditable="true"'];
@@ -787,6 +810,7 @@ function run(){
   const reg=[],unk=[];
   names.forEach(n=>{if(roster.has(n))reg.push({name:n,h:roster.get(n)});else unk.push(n);});
   const [t1,t2]=distribute(reg);
+  if(excViol.length)msg.textContent='배제 쌍 중 지키지 못한 쌍: '+excViol.map(p=>p.join('-')).join(', ');
   const tm=[t1.map(p=>({name:p.name,h:p.h})),t2.map(p=>({name:p.name,h:p.h}))];
   unk.forEach(n=>{const k=tm[0].length<=tm[1].length?0:1;tm[k].push({name:n,h:null});});
   const sm=t=>t.reduce((a,p)=>a+(p.h||0),0);
@@ -956,7 +980,8 @@ const HIST=[
  "- 회원명부 버튼 재클릭으로 닫기, '조편성 돌아가기'를 '닫기'로 변경",
  "- 번호·체크박스 칼럼, 선택행 삭제, 칼럼 클릭 정렬",
  "- 입력된 명단 참가횟수 1회 증가, 참가횟수 초기화, 수정취소",
- "- 회원명부 버튼을 기능별 2줄로 배치"
+ "- 회원명부 버튼을 기능별 2줄로 배치",
+ "- 토요리그 배제 리스트 반영 개선(여러 쌍이 서로 깨지지 않도록 전체 재검사, 해가 없으면 부수 불균형 최소화, 같은 부수 내 순서 무작위)"
 ].join('\n');
 let hist=false,histBox='';
 function showHist(){
