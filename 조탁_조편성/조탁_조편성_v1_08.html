@@ -20,6 +20,9 @@ button.pri{background:#2b4a7a;color:#fff}button.on{background:#2b4a7a;color:#fff
 #tabs{margin:0 0 8px;display:flex;gap:6px}
 #dlg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9}
 #dlg>div{background:#fff;max-width:460px;margin:60px auto;padding:14px;border-radius:6px}
+#hDlg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9}
+#hDlg>div{background:#fff;max-width:520px;margin:60px auto;padding:14px;border-radius:6px}
+#hBody{max-height:60vh;overflow-y:auto;font-size:13px;line-height:1.6;white-space:pre-wrap;margin:8px 0}
 .pgw{margin:0 0 14px;padding:0 8px;overflow:hidden}.pgw.off{display:none}
 .pg{--s:var(--ss);position:relative;width:calc(var(--W)*var(--s)*1px);height:calc(var(--H)*var(--s)*1px);margin:0 auto;background:#fff;overflow:hidden;box-shadow:0 0 0 1px #cfd5de}
 .pg table{position:absolute;left:0;top:0;border-collapse:collapse;table-layout:fixed;width:calc(var(--W)*1px);zoom:var(--s)}
@@ -71,7 +74,7 @@ td.sel,td.sel:focus{outline:3px solid #d9480f;outline-offset:-3px;background:#ff
   <label>인원 <input type="number" id="cnt" value="15" min="1"> 명</label>
   <span class="hint" id="rng">철인 12~17명</span>
   <button id="bRnd" title="테스트용 기능입니다. 내장 명단에서 인원수만큼 무작위로 입력합니다(부수별 최소 1명 포함).">참가자 무작위</button>
-  <button id="bHist" title="버전별 업데이트 이력을 아래 요약 영역에 표시합니다. 다른 곳을 누르면 원래 화면으로 돌아갑니다.">업데이트 이력</button>
+  <button id="bHist" title="버전별 업데이트 이력을 팝업창으로 표시합니다(최신 버전이 위, 길면 세로 스크롤). 닫기 버튼, 창 바깥 클릭 또는 Esc로 닫습니다.">업데이트 이력</button>
   <button id="bMem" title="회원명부(구글 시트 명단)를 표로 보여주고 편집·저장하는 화면으로 전환합니다. 저장하려면 편집 암호가 필요합니다. 회원명부 화면이 열려 있을 때 다시 누르거나 '닫기'를 누르면 원래 화면으로 돌아갑니다.">회원명부</button>
  </div>
  <p class="hint" style="margin:8px 0 4px">이름만 입력하세요 (공백, 쉼표, 줄바꿈으로 구분). 철인리그는 입력 순서대로 번호가 매겨집니다.</p>
@@ -121,6 +124,11 @@ td.sel,td.sel:focus{outline:3px solid #d9480f;outline-offset:-3px;background:#ff
  <p style="margin:0 0 8px;font-size:14px">같은 조에 배치하지 않을 인원 쌍을 입력하세요 (한 줄에 한 쌍)<br>형식: 이름1,이름2</p>
  <textarea id="exTxt"></textarea>
  <div class="row" style="margin-top:8px"><button class="pri" id="exSave" title="입력한 배제 쌍을 저장하고 창을 닫습니다. 다음 토요리그 조편성부터 적용됩니다.">저장</button><button id="exClose" title="저장하지 않고 창을 닫습니다.">닫기</button></div>
+</div></div>
+<div id="hDlg"><div>
+ <div id="hTit" style="font-size:15px;font-weight:bold"></div>
+ <div id="hBody"></div>
+ <div class="row"><button class="pri" id="hClose" title="업데이트 이력 창을 닫습니다.">닫기</button></div>
 </div></div>
 <script>
 const VER='1.08';
@@ -981,13 +989,20 @@ const HIST=[
  "- 번호·체크박스 칼럼, 선택행 삭제, 칼럼 클릭 정렬",
  "- 입력된 명단 참가횟수 1회 증가, 참가횟수 초기화, 수정취소",
  "- 회원명부 버튼을 기능별 2줄로 배치",
- "- 토요리그 배제 리스트 반영 개선(여러 쌍이 서로 깨지지 않도록 전체 재검사, 해가 없으면 부수 불균형 최소화, 같은 부수 내 순서 무작위)"
+ "- 토요리그 배제 리스트 반영 개선(여러 쌍이 서로 깨지지 않도록 전체 재검사, 해가 없으면 부수 불균형 최소화, 같은 부수 내 순서 무작위)",
+ "- 업데이트 이력을 팝업창으로 표시(최신 버전이 위, 길면 세로 스크롤)"
 ].join('\n');
 let hist=false,histBox='';
-function showHist(){
- if(!hist){hist=true;histBox=$('sumBox').style.display;}
- $('sum').textContent=HIST;$('sumBox').style.display='block';
+function histNewest(){
+ const B=[];
+ HIST.split('\n').slice(1).forEach(l=>{if(/^v\d/.test(l))B.push([l]);else if(l.trim()&&B.length)B[B.length-1].push(l);});
+ return B.reverse().map(b=>b.join('\n')).join('\n\n');
 }
+function showHist(){
+ $('hTit').textContent=HIST.split('\n')[0];$('hBody').textContent=histNewest();
+ $('hBody').scrollTop=0;$('hDlg').style.display='block';
+}
+function hideHist(){$('hDlg').style.display='none';}
 function closeHist(e){
  if(!hist)return;
  const t=e.target;if(!t.closest||t.closest('#bHist'))return;
@@ -996,6 +1011,9 @@ function closeHist(e){
  if(pages.length)updateSummary();else $('sum').textContent='';
 }
 $('bHist').addEventListener('click',showHist);
+$('hClose').addEventListener('click',hideHist);
+$('hDlg').addEventListener('click',e=>{if(e.target===$('hDlg'))hideHist();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('hDlg').style.display==='block')hideHist();});
 ['click','input','change'].forEach(n=>document.addEventListener(n,closeHist,true));
 showBlank();
 loadRoster();
