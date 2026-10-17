@@ -29,6 +29,9 @@ button.pri{background:#2b4a7a;color:#fff}button.on{background:#2b4a7a;color:#fff
 #bkList button{display:block;width:100%;text-align:left;margin:0 0 4px}
 #bRun,#bClr,#bExc,#bExp,#bPrn,#bPr1,#bPr2,#bUndo,#bRedo{padding:6px 8px}
 #bUndo:disabled,#bRedo:disabled{opacity:.4;cursor:not-allowed}
+#hbar{display:none;position:fixed;top:0;left:0;right:0;z-index:5;align-items:center;justify-content:center;flex-wrap:wrap;gap:12px;background:#fff;border-bottom:1px solid #cfd5de;padding:8px 16px;font-size:14px}
+#hbar.on{display:flex}#hbar button:disabled{opacity:.4;cursor:not-allowed}
+@media print{#hbar{display:none!important}}
 .pgw{margin:0 0 14px;padding:0 8px;overflow:hidden}.pgw.off{display:none}
 .pg{--s:var(--ss);position:relative;width:calc(var(--W)*var(--s)*1px);height:calc(var(--H)*var(--s)*1px);margin:0 auto;background:#fff;overflow:hidden;box-shadow:0 0 0 1px #cfd5de}
 .pg table{position:absolute;left:0;top:0;border-collapse:collapse;table-layout:fixed;width:calc(var(--W)*1px);zoom:var(--s)}
@@ -120,7 +123,8 @@ td.sel,td.sel:focus{outline:3px solid #d9480f;outline-offset:-3px;background:#ff
  </div>
  <div class="box" style="overflow:auto"><table id="mTbl"><colgroup><col style="width:5%"><col style="width:6%"><col style="width:20%"><col style="width:10%"><col style="width:12%"><col style="width:35%"><col style="width:12%"></colgroup><thead><tr><th><input type="checkbox" id="mAll" title="전체 선택/해제"></th><th>번호</th><th data-c="0" title="이름순으로 정렬합니다(다시 누르면 오름/내림 전환).">이름<span class="sa"></span></th><th data-c="1" title="부수순으로 정렬합니다(다시 누르면 오름/내림 전환).">부수<span class="sa"></span></th><th data-c="2" title="참가횟수순으로 정렬합니다(다시 누르면 오름/내림 전환).">참가횟수<span class="sa"></span></th><th data-c="3" title="메모순으로 정렬합니다(다시 누르면 오름/내림 전환).">메모<span class="sa"></span></th><th></th></tr></thead><tbody id="mBody"></tbody></table></div>
 </div>
-<div id="swapbar"><span id="swTip" title="선택한 두 이름의 자리를 서로 바꿉니다. 토요리그는 1조와 2조 사이의 이름도 교체할 수 있습니다."><button id="bSwap" disabled>상호교체</button></span><button id="bUndo2" disabled title="직전 작업을 취소하고 이전 화면 상태로 되돌립니다(Ctrl+Z). 위쪽 '실행 취소' 버튼과 같은 기능입니다.">실행 취소</button><button id="bRedo2" disabled title="취소한 작업을 다시 실행합니다(Ctrl+Y 또는 Ctrl+Shift+Z). 위쪽 '다시 실행' 버튼과 같은 기능입니다.">다시 실행</button><span id="swInfo">이름을 2개 선택하세요</span></div>
+<div id="swapbar"><span id="swTip" title="선택한 두 이름의 자리를 서로 바꿉니다. 토요리그는 1조와 2조 사이의 이름도 교체할 수 있습니다."><button id="bSwap" disabled>상호교체</button></span><span id="swInfo">이름을 2개 선택하세요</span></div>
+<div id="hbar"><button id="hbUndo" disabled title="직전 작업을 취소하고 이전 화면 상태로 되돌립니다(Ctrl+Z).">실행 취소</button><button id="hbRedo" disabled title="취소한 작업을 다시 실행합니다(Ctrl+Y 또는 Ctrl+Shift+Z).">다시 실행</button></div>
 <div id="stage"></div>
 <svg id="ov" xmlns="http://www.w3.org/2000/svg"></svg>
 <div id="pwDlg"><div>
@@ -1051,7 +1055,8 @@ const HIST=[
  "- 회원명부에 '백업본으로 복구' 버튼 추가(저장 오른쪽): 백업 날짜·시간을 최근 순 팝업(세로 스크롤)으로 표시",
  "- 백업을 누르면 표에만 적용되고 '저장'을 눌러야 시트에 확정(확정 전 '수정취소'로 되돌리기 가능)",
  "- 조편성 버튼행에 '실행 취소'/'다시 실행' 추가(인쇄 오른쪽, Ctrl+Z / Ctrl+Y 지원): 조편성·초기화·상호교체·셀 입력·회원명부 화면 편집 등 최초 실행부터의 작업을 리플레이처럼 되돌리고 재현(최대 500단계, 새로고침 시 초기화, 시트 저장·팝업창 열림 상태는 제외)",
- "- 조편성 버튼행의 버튼 좌우 여백을 줄여 버튼 영역 확보"
+ "- 조편성 버튼행의 버튼 좌우 여백을 줄여 버튼 영역 확보",
+ "- 회원명부 화면에서 스크롤로 '실행 취소'/'다시 실행' 버튼이 가려지면 화면 맨 위에 같은 버튼을 한 줄로 표시, 실행 취소/다시 실행 시 스크롤 위치 유지"
 ].join('\n');
 let hist=false,histBox='';
 function histNewest(){
@@ -1097,7 +1102,8 @@ function hSnap(){
  return s;
 }
 function hApply(s){
- hRest=true;const sx=window.scrollX,sy=window.scrollY;
+ hRest=true;
+ const sy=window.scrollY;
  try{
   ['dlg','hDlg','bkDlg','pwDlg'].forEach(id=>{$(id).style.display='none';});pwCb=null;$('pwIn').value='';
   document.querySelector('input[name=mode][value='+s.m+']').checked=true;
@@ -1122,11 +1128,12 @@ function hApply(s){
   }
   fit();
   sel=s.sl.map(a=>{const td=selTd(a[0],a[1],'r');return td?{s:a[0],i:a[1],td:td}:null;}).filter(Boolean);
-  refreshSel();window.scrollTo(sx,sy);
+  refreshSel();
+  if(s.mo)window.scrollTo(0,sy);
  }finally{hRest=false;}
  hS[hI]=JSON.stringify(hSnap());hUi();
 }
-function hUi(){const u=hI<=0,r=hI>=hS.length-1;$('bUndo').disabled=u;$('bUndo2').disabled=u;$('bRedo').disabled=r;$('bRedo2').disabled=r;}
+function hUi(){$('bUndo').disabled=hI<=0;$('bRedo').disabled=hI>=hS.length-1;}
 function hRec(){
  if(hRest||memSaving||bkBusy||!hS.length)return;
  const j=JSON.stringify(hSnap());
@@ -1146,7 +1153,7 @@ function hGo(d){
 function hInit(){hS=[JSON.stringify(hSnap())];hI=0;hUi();}
 ['click','change','drop','paste','keydown'].forEach(n=>document.addEventListener(n,e=>{
  if(n==='keydown'&&e.key!=='Enter'&&e.key!=='Escape')return;
- if(n==='click'&&e.target.closest&&e.target.closest('#bUndo,#bRedo,#bUndo2,#bRedo2'))return;
+ if(n==='click'&&e.target.closest&&e.target.closest('#bUndo,#bRedo'))return;
  hFlush();setTimeout(hRec,0);
 },true));
 document.addEventListener('input',e=>{
@@ -1165,10 +1172,20 @@ document.addEventListener('keydown',e=>{
  if(hTm&&a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA'||a.isContentEditable))return;
  e.preventDefault();hGo(un?-1:1);
 });
-$('bUndo').addEventListener('click',()=>setTimeout(()=>hGo(-1),0));
-$('bRedo').addEventListener('click',()=>setTimeout(()=>hGo(1),0));
-$('bUndo2').addEventListener('click',()=>setTimeout(()=>hGo(-1),0));
-$('bRedo2').addEventListener('click',()=>setTimeout(()=>hGo(1),0));
+$('bUndo').addEventListener('click',()=>hGo(-1));
+$('bRedo').addEventListener('click',()=>hGo(1));
+function hbUpd(){
+ $('hbar').classList.toggle('on',document.body.classList.contains('memOpen')&&$('bUndo').getBoundingClientRect().bottom<0);
+ $('hbUndo').disabled=$('bUndo').disabled;$('hbRedo').disabled=$('bRedo').disabled;
+}
+window.addEventListener('scroll',hbUpd,{passive:true});
+window.addEventListener('resize',hbUpd);
+const hbMo=new MutationObserver(hbUpd);
+hbMo.observe(document.body,{attributes:true,attributeFilter:['class']});
+hbMo.observe($('bUndo'),{attributes:true,attributeFilter:['disabled']});
+hbMo.observe($('bRedo'),{attributes:true,attributeFilter:['disabled']});
+$('hbUndo').addEventListener('click',()=>setTimeout(()=>hGo(-1),0));
+$('hbRedo').addEventListener('click',()=>setTimeout(()=>hGo(1),0));
 showBlank();
 hInit();
 loadRoster();
