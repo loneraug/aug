@@ -43,7 +43,7 @@ td.al{text-align:left;vertical-align:top;padding:4px 6px}td.nr{border-right:0}td
 td.sel,td.sel:focus{outline:3px solid #d9480f;outline-offset:-3px;background:#ffe3d0}
 #swapbar{display:none;position:sticky;top:0;z-index:5;align-items:center;justify-content:center;flex-wrap:wrap;gap:12px;background:#fff;border-bottom:1px solid #cfd5de;padding:8px 16px;font-size:14px}
 #swapbar.on{display:flex}#swapbar button:disabled{opacity:.4;cursor:not-allowed}
-#sbHist{display:none}#swapbar.hv #sbHist{display:inline}
+#sbHist{display:none;position:absolute;top:50%;transform:translateY(-50%)}#swapbar.hv #sbHist{display:block}
 #ov{position:absolute;left:0;top:0;width:1px;height:1px;overflow:visible;pointer-events:none;z-index:4}
 @page{size:A4 landscape;margin:8mm}
 @page bracket{size:A4 portrait;margin:8mm}
@@ -1190,6 +1190,7 @@ function hbUpd(){
  $('hbUndo').disabled=$('bUndo').disabled;$('hbRedo').disabled=$('bRedo').disabled;
  $('swapbar').classList.toggle('hv',!document.body.classList.contains('memOpen')&&$('bUndo').getBoundingClientRect().bottom<0);
  $('sbUndo').disabled=$('bUndo').disabled;$('sbRedo').disabled=$('bRedo').disabled;
+ $('sbHist').style.left=Math.round($('tabs').getBoundingClientRect().left)+'px';
 }
 window.addEventListener('scroll',hbUpd,{passive:true});
 window.addEventListener('resize',hbUpd);
