@@ -101,6 +101,7 @@ td.sel,td.sel:focus{outline:3px solid #d9480f;outline-offset:-3px;background:#ff
   <span class="hint">전체 인쇄는 크롬/엣지 권장(페이지별 용지 방향이 다름). 배율 100%, 여백 기본으로 설정하세요. 1 페이지/2 페이지는 해당 페이지만 인쇄합니다.</span>
  </div>
  <div id="msg"></div>
+  <div id="stamp" style="font-weight:bold"></div>
 </div>
 <div class="box" id="sumBox" style="display:none"><div id="sum"></div></div>
 <div id="tabs"></div>
@@ -301,6 +302,15 @@ const ROSTER_API_URL='https://script.google.com/macros/s/AKfycbyyNNcGwVFC0y-9Zq6
 const LOAD_MSG='명단 불러오는 중입니다...';
 let rosterRows=[],rosterWarns=[],rosterSrc='',rosterLoading=false;
 let memDirty=false,memSaving=false,pwCb=null;
+let stTxt='',stCur=null,stIni='';
+function stDate(d){return d.getFullYear()+'년 '+(d.getMonth()+1)+'월 '+d.getDate()+'일 수정본';}
+function stBk(n){const m=/^백업_(\d{4})(\d{2})(\d{2})/.exec(n);return m?(+m[1])+'년 '+(+m[2])+'월 '+(+m[3])+'일 수정본':'';}
+function stSig(){return JSON.stringify(readTbl().map(r=>r.join('\u0001')).sort());}
+function stUpd(){
+ let s=stTxt;
+ if(document.body.classList.contains('memOpen')&&stCur)s=stCur.sig===stSig()?stCur.t:'';
+ $('stamp').textContent=s;
+}
 let initRows=[],sortCol=-1,sortAsc=true,guideMsg='';
 let bkBusy=false;
 function parseCsv(t){
@@ -333,6 +343,7 @@ function applyRoster(rows,src){
  rosterRows=rows.map(r=>r.slice());
  roster.clear();rows.forEach(r=>roster.set(r[0],r[1]));
  rosterSrc=src;
+ if(src==='sheet'){stTxt=stDate(new Date());stUpd();}
 }
 function fetchSheet(){
  const ctl=new AbortController(),tm=setTimeout(()=>ctl.abort(),15000);
@@ -359,7 +370,7 @@ function loadRoster(){
   const n=normRows(raw);
   if(!n.rows.length)throw new Error('명단이 비어 있습니다.');
   applyRoster(n.rows,'sheet');rosterWarns=n.warns;rosterLoading=false;endLoadMsg();
-  initRows=rosterRows.map(r=>r.slice());
+  initRows=rosterRows.map(r=>r.slice());stIni=stTxt;
   if(n.warns.length)$('msg').textContent='시트 명단에 문제가 있는 행이 있습니다('+n.warns.length+'건): '+n.warns.slice(0,5).join(' / ')+(n.warns.length>5?' 외':'');
  }).catch(e=>loadFail(e.name==='AbortError'?'시간 초과':String(e.message||e)));
 }
@@ -483,6 +494,7 @@ function memUndo(){
  if(!confirm('처음 불러온 값으로 되돌립니다.\n변경되는 인원: '+d.length+'명\n'+listNames(d)+'\n\n되돌리시겠습니까?'))return;
  clearGuide();renderMem(initRows);
  memDirty=diffNames(initRows,rosterRows).length>0;
+ stCur={t:stIni,sig:stSig()};stUpd();
  $('mInfo').textContent=memDirty?'처음 불러온 값으로 되돌렸습니다. 저장해야 시트까지 되돌아갑니다.':'처음 불러온 값으로 되돌렸습니다.';
 }
 function bkFetch(qs){
@@ -517,6 +529,7 @@ function bkPick(name){
   if(!confirm((memDirty?'현재 편집 중인 내용이 있습니다. 백업으로 덮어씁니다.\n':'')+lb+' 백업으로 되돌립니다.\n현재 표와 달라지는 인원: '+diff.length+'명\n'+listNames(diff)+'\n\n※ 표에만 적용되며, \'저장\'을 눌러야 시트에 확정됩니다.\n\n진행하시겠습니까?')){$('mInfo').textContent='';return;}
   clearGuide();renderMem(n.rows);
   memDirty=diffNames(n.rows,rosterRows).length>0;showMemWarn(n.warns);
+  stCur={t:stBk(name),sig:stSig()};stUpd();
   $('mInfo').textContent=lb+' 백업을 불러왔습니다('+n.rows.length+'명). '+(memDirty?'저장해야 시트에 확정됩니다.':'현재 시트와 동일합니다.');
  }).catch(e=>{$('mInfo').textContent='';showMemWarn(['백업을 불러오지 못했습니다. ('+bkErr(e)+')']);}).finally(()=>{bkBusy=false;hRec();});
 }
@@ -525,11 +538,13 @@ function openMem(){
  renderMem(rosterRows);memDirty=false;$('mInfo').textContent='';
  showMemWarn(rosterWarns.length?rosterWarns.concat(['※ 제외된 행은 저장하면 시트에서 사라집니다(이전 내용은 시트의 백업 시트에 남습니다).']):[]);
  document.body.classList.add('memOpen');$('memView').style.display='';
+ stCur={t:stTxt,sig:stSig()};stUpd();
 }
 function closeMem(){
  if(memDirty&&!confirm('저장하지 않은 편집 내용이 있습니다. 돌아가면 편집 내용이 버려집니다.\n돌아가시겠습니까?'))return;
  memDirty=false;document.body.classList.remove('memOpen');$('memView').style.display='none';
  fit();refreshSel();
+ stUpd();
 }
 function validateTbl(raw){
  const errs=[],rows=[],seen={};
@@ -562,6 +577,7 @@ function doSave(pw,rows){
  fetch(ROSTER_API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({pw:pw,rows:sorted}),signal:ctl.signal}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}).then(d=>{
   if(!d||d.ok!==true)throw new Error((d&&d.error)||'응답 형식 오류');
   applyRoster(sorted,'sheet');rosterWarns=[];renderMem(sorted);memDirty=false;showMemWarn([]);
+   stCur={t:stTxt,sig:stSig()};stUpd();
   $('mInfo').textContent='저장되었습니다. ('+sorted.length+'명, 이름 가나다순)';
  }).catch(e=>{
   showMemWarn([e.name==='AbortError'?'저장 요청이 시간 초과되었습니다. 시트에서 저장 여부를 확인하세요.':String(e.message||e)]);
@@ -611,6 +627,7 @@ $('atClose').addEventListener('click',atClose);
 $('atTxt').addEventListener('click',atTxt);
 $('atImg').addEventListener('click',atImg);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('atDlg').style.display==='block')atClose();});
+['input','change','click','keydown','paste','drop'].forEach(n=>document.addEventListener(n,()=>setTimeout(stUpd,0),true));
 $('mUndo').addEventListener('click',memUndo);
 $('mRestore').addEventListener('click',bkOpen);
 $('bkClose').addEventListener('click',bkHide);
@@ -1127,7 +1144,8 @@ const HIST=[
  "- 실행 취소/다시 실행 시 되돌려진 위치로 화면 이동: 버튼으로 생긴 변경은 그 버튼, 명단 입력·인원수·리그 선택·상호교체·결과지 입력 칸·회원명부 칸/행/체크 변경은 바뀐 곳이 보이게 이동(이미 보이면 스크롤 유지)",
  "", "v1.12  의무 출석 미충족 명단",
  "- 회원명부 '참가횟수 초기화' 오른쪽에 '의무 출석' 버튼 추가: 출석(참가횟수) 0회·1회 인원(메모 공란·신규·재가입)과 병가등 사유 인원(이름(사유) 표시)을 정리해 팝업으로 표시(예외·가입대기 제외)",
- "- 팝업에서 내용을 직접 수정할 수 있으며 수정한 내용 그대로 txt 파일/이미지(PNG)로 내보내 밴드 공지에 사용"
+ "- 팝업에서 내용을 직접 수정할 수 있으며 수정한 내용 그대로 txt 파일/이미지(PNG)로 내보내 밴드 공지에 사용",
+ "- 명단을 시트에서 불러오면 상단에 'YYYY년 M월 D일 수정본'을 진하게 표시(회원명부 화면에서도 유지). 명단을 수정하면 표시를 지우고 '저장'으로 확정하면 저장일로 갱신, 백업본으로 되돌리면 그 백업 날짜로 표시"
 ].join('\n');
 let hist=false,histBox='';
 function histNewest(){
