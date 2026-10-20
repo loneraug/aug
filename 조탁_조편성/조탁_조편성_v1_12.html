@@ -15,6 +15,7 @@ textarea{width:100%;box-sizing:border-box;height:96px;font:15px 'Malgun Gothic',
 button{font:14px 'Malgun Gothic',sans-serif;padding:6px 14px;border:1px solid #2b4a7a;background:#fff;color:#2b4a7a;border-radius:4px;cursor:pointer}
 button.pri{background:#2b4a7a;color:#fff}button.on{background:#2b4a7a;color:#fff}
 #msg{color:#b3261e;font-size:14px;min-height:18px;margin:6px 0 0}
+#msg.ld{font-weight:bold}
 #sum{font-size:13px;line-height:1.6;white-space:pre-wrap}
 .hint{font-size:12px;color:#667}
 #tabs{margin:0 0 8px;display:flex;gap:6px}
@@ -300,10 +301,12 @@ function allPairs(){return defaultPairs().concat(textToPairs(loadUserText()));}
 const roster=new Map();
 const ROSTER_API_URL='https://script.google.com/macros/s/AKfycbyyNNcGwVFC0y-9Zq6HMp_wDgVN-ZGTQ7d3xflBrX32jR4BJvbnLhrLTzOdBYdVni4ZJA/exec';
 const LOAD_MSG='명단 불러오는 중입니다...';
+new MutationObserver(()=>{const m=document.getElementById('msg');m.classList.toggle('ld',m.textContent===LOAD_MSG);}).observe(document.getElementById('msg'),{childList:true});
 let rosterRows=[],rosterWarns=[],rosterSrc='',rosterLoading=false;
 let memDirty=false,memSaving=false,pwCb=null;
-let stTxt='',stCur=null,stIni='';
+let stTxt='',stCur=null,stIni='',stNext='';
 function stDate(d){return d.getFullYear()+'년 '+(d.getMonth()+1)+'월 '+d.getDate()+'일 수정본';}
+function stSv(t){const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(String(t||''));return m?(+m[1])+'년 '+(+m[2])+'월 '+(+m[3])+'일 수정본':'';}
 function stBk(n){const m=/^백업_(\d{4})(\d{2})(\d{2})/.exec(n);return m?(+m[1])+'년 '+(+m[2])+'월 '+(+m[3])+'일 수정본':'';}
 function stSig(){return JSON.stringify(readTbl().map(r=>r.join('\u0001')).sort());}
 function stUpd(){
@@ -343,12 +346,13 @@ function applyRoster(rows,src){
  rosterRows=rows.map(r=>r.slice());
  roster.clear();rows.forEach(r=>roster.set(r[0],r[1]));
  rosterSrc=src;
- if(src==='sheet'){stTxt=stDate(new Date());stUpd();}
+ if(src==='sheet'){stTxt=stNext;stUpd();}
 }
 function fetchSheet(){
  const ctl=new AbortController(),tm=setTimeout(()=>ctl.abort(),15000);
  return fetch(ROSTER_API_URL,{signal:ctl.signal}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}).then(d=>{
   if(!d||d.ok!==true||!Array.isArray(d.rows))throw new Error((d&&d.error)||'응답 형식 오류');
+  stNext=stSv(d.saved);
   return d.rows.slice(1);
  }).finally(()=>clearTimeout(tm));
 }
@@ -576,6 +580,7 @@ function doSave(pw,rows){
  const ctl=new AbortController(),tm=setTimeout(()=>ctl.abort(),30000);
  fetch(ROSTER_API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({pw:pw,rows:sorted}),signal:ctl.signal}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}).then(d=>{
   if(!d||d.ok!==true)throw new Error((d&&d.error)||'응답 형식 오류');
+  stNext=stSv(d.saved)||stDate(new Date());
   applyRoster(sorted,'sheet');rosterWarns=[];renderMem(sorted);memDirty=false;showMemWarn([]);
    stCur={t:stTxt,sig:stSig()};stUpd();
   $('mInfo').textContent='저장되었습니다. ('+sorted.length+'명, 이름 가나다순)';
