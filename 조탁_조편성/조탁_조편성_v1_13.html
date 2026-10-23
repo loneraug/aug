@@ -42,7 +42,7 @@ button.pri{background:#2b4a7a;color:#fff}button.on{background:#2b4a7a;color:#fff
 td{border:1px solid #000;text-align:center;vertical-align:middle;font-weight:bold;padding:0;overflow:hidden;white-space:nowrap;font-size:11pt;line-height:1;outline:0}
 td:focus{background:#fff8c5}
 td.dh{background:repeating-linear-gradient(45deg,transparent 0 3px,#000 3px 4px)}
-td.ds{background:linear-gradient(to top right,transparent calc(50% - .5px),#000 calc(50% - .5px),#000 calc(50% + .5px),transparent calc(50% + .5px))}td.nb{border:0}td.wr{white-space:pre-wrap}
+td.ds{--dsl:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cline x1='0' y1='0' x2='100' y2='100' stroke='%23000' stroke-width='1' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");background:var(--dsl) center/100% 100% no-repeat;-webkit-print-color-adjust:exact;print-color-adjust:exact}td.nb{border:0}td.nb.hd{border:1px hidden #000}td.wr{white-space:pre-wrap}
 td.al{text-align:left;vertical-align:top;padding:4px 6px}td.nr{border-right:0}td.nl{border-left:0}
 td.sel,td.sel:focus{outline:3px solid #d9480f;outline-offset:-3px;background:#ffe3d0}
 #swapbar{display:none;position:sticky;top:0;z-index:5;align-items:center;justify-content:center;flex-wrap:wrap;gap:12px;background:#fff;border-bottom:1px solid #cfd5de;padding:8px 16px;font-size:14px}
@@ -57,7 +57,7 @@ td.sel,td.sel:focus{outline:3px solid #d9480f;outline-offset:-3px;background:#ff
  .pgw,.pgw.off{display:block;margin:0;padding:0;overflow:visible;break-after:page}
  .pgw:last-child{break-after:auto}
  .pg{--s:var(--sp);box-shadow:none}
- td:focus{background:none}td.ds:focus{background:linear-gradient(to top right,transparent calc(50% - .5px),#000 calc(50% - .5px),#000 calc(50% + .5px),transparent calc(50% + .5px))}
+ td:focus{background:none}td.ds:focus{background:var(--dsl) center/100% 100% no-repeat}
 }
 @media print{#swapbar,#ov{display:none!important}td.sel,td.sel:focus{outline:0;background:none}}
 @media print{.pgw[data-o=p]{padding-top:10mm}}
@@ -806,7 +806,7 @@ function bracketSheet(N){
  rs.forEach((r,i)=>{
   rows.push([cell(i+1,{fs:14,rs:2})].concat(r.t.map(v=>cell(v,{fs:12})),[cell('',{cls:'nb'})],nm(i*2)));
   rows.push(r.b.map(v=>cell(v,{fs:12})).concat([cell('',{cls:'nb'})],nm(i*2+1)));
-  rows.push([cell('',{cs:tot,cls:'nb'})]);
+  rows.push([cell('',{cs:tot-3,cls:'nb'}),cell('',{cs:3,cls:i*2+1>=N?'nb hd':'nb'})]);
  });
  rows.push([cell('반드시 각 라운드 별로 순서대로 진행해야 합니다. ',{cs:h+1,fs:11,cls:'nb'})]);
  return tbl(cw,rh,rows);
