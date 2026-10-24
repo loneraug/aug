@@ -485,18 +485,35 @@ function atOpen(){
  atShow('의무 출석 미충족 안내','의무출석_미충족_',atBuild());
 }
 function atClose(){$('atDlg').style.display='none';}
-function chgLoad(n){
- return bkFetch('?action=backup&name='+encodeURIComponent(n)).then(x=>{
-  if(!x||x.ok!==true||!Array.isArray(x.rows))throw new Error((x&&x.error)||'응답 형식 오류');
+function chgFatal(m){const e=new Error(m);e.fatal=true;return e;}/* 재시도하지 않는 오류(서버가 응답했으나 내용 문제) */
+function chgRetry(fn){
+ let k=0;
+ function go(){
+  return fn().catch(e=>{
+   if((e&&e.fatal)||++k>=CHG_BG_TRY)throw e;
+   return new Promise(r=>setTimeout(r,CHG_BG_WAIT[Math.min(k-1,CHG_BG_WAIT.length-1)])).then(go);
+  });
+ }
+ return go();
+}
+function chgRace(p,ms){
+ return new Promise((ok,no)=>{
+  const t=setTimeout(()=>{const e=new Error('시간 초과');e.name='AbortError';no(e);},ms);
+  p.then(v=>{clearTimeout(t);ok(v);},e=>{clearTimeout(t);no(e);});
+ });
+}
+function chgLoad(n,ms){
+ return bkFetch('?action=backup&name='+encodeURIComponent(n),ms).then(x=>{
+  if(!x||x.ok!==true||!Array.isArray(x.rows))throw chgFatal((x&&x.error)||'응답 형식 오류');
   const g=normRows(x.rows.slice(1));
-  if(!g.rows.length)throw new Error('백업이 비어 있습니다.');
+  if(!g.rows.length)throw chgFatal('백업이 비어 있습니다.');
   const m=new Map();g.rows.forEach(r=>{if(!m.has(r[0]))m.set(r[0],r[2]);});
   return m;
  });
 }
-function chgGet(n){
+function chgGet(n,bg){
  if(chgCache.has(n))return chgCache.get(n);
- const p=chgLoad(n);
+ const p=bg?chgRetry(()=>chgLoad(n,CHG_BG_TO)):chgLoad(n);
  chgCache.set(n,p);p.catch(()=>{if(chgCache.get(n)===p)chgCache.delete(n);});
  return p;
 }
@@ -533,12 +550,13 @@ function chgSaveShow(rows,prev,cb){
  for(let j=0;j<A.length;j+=ATT_COLS)o.push(A.slice(j,j+ATT_COLS).map(x=>x[0]+'('+x[1]+'→'+x[2]+')').join('  '));
  $('svText').value=o.join('\n');svCb=cb;$('svDlg').style.display='block';$('svText').scrollTop=0;
 }
-function chgWalk(names,cur){
+function chgWalk(names,cur,lim,bg){
  const ch=[];let nw={t:'현행(저장본)',m:cur},reset=false,i=0;
  function step(){
   if(reset||ch.length>=CHG_MAX||i>=names.length)return Promise.resolve({ch:ch,reset:reset});
   const sl=names.slice(i,i+CHG_BATCH);i+=sl.length;
-  return Promise.all(sl.map(n=>chgGet(n))).then(ms=>{
+  const pr=Promise.all(sl.map(n=>chgGet(n,bg)));
+  return (lim?chgRace(pr,lim):pr).then(ms=>{
    for(let k=0;k<ms.length&&!reset&&ch.length<CHG_MAX;k++){
     const b={t:bkLabel(sl[k]),m:ms[k]},A=[];
     nw.m.forEach((v,n)=>{const p=b.m.has(n)?b.m.get(n):0;if(v>p)A.push([n,p,v]);});
@@ -558,13 +576,17 @@ function chgAfterSave(rows){
 }
 function chgPre(){
  if(rosterSrc!=='sheet')return;
- bkFetch('?action=backups').then(d=>{
-  if(!d||d.ok!==true||!Array.isArray(d.backups))return;
+ if(chgPreRun){chgPreAgain=true;return;}
+ chgPreRun=true;chgPreAgain=false;
+ chgRetry(()=>bkFetch('?action=backups',CHG_BG_TO).then(d=>{
+  if(!d||d.ok!==true||!Array.isArray(d.backups))throw chgFatal('응답 형식 오류');
+  return d;
+ })).then(d=>{
   chgNote(d.backups);
   const cur=chgSaved();
   if(![...cur.values()].some(v=>v>0))return;
-  return chgWalk(d.backups,cur);
- }).catch(()=>{});
+  return chgWalk(d.backups,cur,0,true);
+ }).catch(()=>{}).finally(()=>{chgPreRun=false;if(chgPreAgain){chgPreAgain=false;chgPre();}});
 }
 function chgOpen(){
  if(memSaving||bkBusy)return;
@@ -603,11 +625,11 @@ function chgOpen(){
   if(!d||d.ok!==true||!Array.isArray(d.backups))throw new Error((d&&d.error)||'백업 기능이 없는 Apps Script입니다. 백업 기능이 포함된 새 버전으로 배포했는지 확인하세요.');
   chgNote(d.backups);
   if(!d.backups.length){if(pre.length)show({ch:[],reset:false});else atShow(T,P,T+'\n\n저장된 백업이 없어 비교할 수 없습니다.');return;}
-  return chgWalk(d.backups,sv).then(show);
+  return chgWalk(d.backups,sv,CHG_CLICK_LIM,false).then(show);
  }).catch(e=>{showMemWarn(['출석 변화를 불러오지 못했습니다. ('+bkErr(e)+')']);}).finally(()=>{bkBusy=false;$('mInfo').textContent='';});
 }
-const ATT_COLS=3,CHG_MAX=5,CHG_BATCH=5;/* 출석 변화 표시 구간 수 / 백업 동시 조회 개수 */let atPre='의무출석_미충족_',svCb=null;const chgCache=new Map();/* 백업 이름 -> (진행 중이거나 완료된) 조회 Promise */
-let chgSeen=null,chgPend=null;/* 마지막으로 본 목록 / 저장 직후 연결 대기 중인 저장 내용 */
+const ATT_COLS=3,CHG_MAX=5,CHG_BATCH=5,CHG_BG_TO=45000,CHG_BG_TRY=5,CHG_BG_WAIT=[3000,6000,12000,24000],CHG_CLICK_LIM=15000;/* 출석 변화 표시 구간 수 / 백업 동시 조회 개수 */let atPre='의무출석_미충족_',svCb=null;const chgCache=new Map();/* 백업 이름 -> (진행 중이거나 완료된) 조회 Promise */
+let chgSeen=null,chgPend=null,chgPreRun=false,chgPreAgain=false;/* 마지막으로 본 목록 / 저장 직후 연결 대기 중인 저장 내용 */
 function atName(ext){const d=new Date(),p2=n=>String(n).padStart(2,'0');return atPre+d.getFullYear()+p2(d.getMonth()+1)+p2(d.getDate())+'.'+ext;}
 function atSave(u,fn){const a=document.createElement('a');a.href=u;a.download=fn;document.body.appendChild(a);a.click();a.remove();}
 function atTxt(){
@@ -638,8 +660,8 @@ function memUndo(){
  stCur={t:stIni,sig:stSig()};stUpd();
  $('mInfo').textContent=memDirty?'처음 불러온 값으로 되돌렸습니다. 저장해야 시트까지 되돌아갑니다.':'처음 불러온 값으로 되돌렸습니다.';
 }
-function bkFetch(qs){
- const ctl=new AbortController(),tm=setTimeout(()=>ctl.abort(),15000);
+function bkFetch(qs,ms){
+ const ctl=new AbortController(),tm=setTimeout(()=>ctl.abort(),ms||15000);
  return fetch(ROSTER_API_URL+qs,{signal:ctl.signal}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}).finally(()=>clearTimeout(tm));
 }
 const bkErr=e=>e.name==='AbortError'?'시간 초과':String(e.message||e);
