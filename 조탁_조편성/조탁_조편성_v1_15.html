@@ -998,6 +998,36 @@ function refreshBracket(){
   const v=s?s.textContent:'';
   if(t.textContent!==v)t.textContent=v;
  });
+ fitNames();
+}
+function fitNames(){
+ const cx=document.createElement('canvas').getContext('2d'),F="'맑은 고딕','Malgun Gothic',sans-serif";
+ document.querySelectorAll('#stage table').forEach(tb=>{
+  const cw=[...tb.querySelectorAll('col')].map(c=>parseFloat(c.style.width)||0),oc=[];
+  [...tb.rows].forEach(tr=>{
+   let c=0;
+   [...tr.cells].forEach(td=>{
+    while(oc[c]>0)c++;
+    const cs=td.colSpan,rs=td.rowSpan;
+    if(td.dataset.s||td.dataset.b!==undefined){
+     let w=0;for(let k=0;k<cs;k++)w+=cw[c+k]||0;
+     const a=w-1;
+     if(td.dataset.f0===undefined)td.dataset.f0=parseFloat(td.style.fontSize)||11;
+     const f0=+td.dataset.f0,t=td.textContent;let fs=f0;
+     if(t.trim()&&a>0){
+      cx.font='bold '+(f0*4/3)+'px '+F;
+      const tw=cx.measureText(t).width,w5=cx.measureText('가나다라마').width;
+      if(tw>a*1.02)fs=Math.max(Math.min(f0,f0*a/w5),f0*a/tw);
+     }
+     const v=(fs===f0?f0:Math.floor(fs*100)/100)+'pt';
+     if(td.style.fontSize!==v)td.style.fontSize=v;
+    }
+    for(let k=0;k<cs;k++)oc[c+k]=rs;
+    c+=cs;
+   });
+   for(let k=0;k<oc.length;k++)if(oc[k]>0)oc[k]--;
+  });
+ });
 }
 function sync(td){
  if(!td||!td.dataset||!td.dataset.s)return;
@@ -1343,7 +1373,8 @@ const HIST=[
  "- 현행(현재 표)과 백업을 최신부터 거슬러 비교하여 출석(참가횟수)이 증가한 최근 5개 구간을 최신순으로 '이름(전→후)'로 팝업 표시(저장 전 표에서 바꾼 출석은 저장본 기준·버튼 누른 시각으로 맨 위에 표시, '저장'을 누르면 암호 입력 전에 저장본 대비 출석 증가분을 팝업으로 표시(전용 확인 창의 '저장'을 누르면 암호 입력으로 진행, '취소'는 저장하지 않음), 메모만 바뀐 백업은 구간에서 제외, 분기 초기화 백업까지만 비교, 현행이 모두 0이면 분기 초기화 안내, txt/이미지 내보내기)",
  "", "v1.15  저장 전 변경 사항 확인",
  "- '저장'을 누르면 암호 입력 전에 저장본 대비 출석 변화(증가·감소, 전원 0이면 '전체 명단 출석 0회로 초기화')·부수 변화·메모 변화·명단 추가/삭제를 전용 확인 창에 표시(변화 없는 항목은 숨기고, 변경이 없어도 안내하며 '저장'으로 암호 입력 진행 가능)",
- "- '출석 변화' 버튼의 저장 전 블록에도 출석 감소와 전체 0회 초기화 표시 적용"
+ "- '출석 변화' 버튼의 저장 전 블록에도 출석 감소와 전체 0회 초기화 표시 적용",
+ "- 결과지·대진표의 이름이 칸보다 길면 그 이름이 든 칸의 글자 크기만 자동 축소(칸 크기 불변, 한글 5자 폭까지 축소하고 6자 이상은 5자 크기에서 멈춰 넘치는 부분은 잘림)"
 ].join('\n');
 let hist=false,histBox='';
 function histNewest(){
