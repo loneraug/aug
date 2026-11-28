@@ -40,7 +40,12 @@ button.pri{background:#2b4a7a;color:#fff}button.on{background:#2b4a7a;color:#fff
 #bzDlg.drop #bzDrop{background:#eef3ff;border-color:#246}
 #bzMsg{font-size:13px;min-height:1.4em;margin:6px 0;white-space:pre-wrap}
 #bzMsg.bad{color:#c00}
-#mZip.pri{background:#b45309;color:#fff}
+.seg{display:inline-flex}
+.seg button{border-radius:0}
+.seg button:first-child{border-radius:4px 0 0 4px}
+.seg button:last-child{border-radius:0 4px 4px 0;margin-left:-1px}
+#mSrcZip.on{background:#b45309;border-color:#b45309;color:#fff}
+#mSrcInfo.warn{color:#b45309;font-weight:bold}
 #bRun,#bClr,#bExc,#bExp,#bPrn,#bPr1,#bPr2,#bUndo,#bRedo{padding:6px 8px}
 #bUndo:disabled,#bRedo:disabled{opacity:.4;cursor:not-allowed}
 #hbar{display:none;position:fixed;top:0;left:0;right:0;z-index:5;align-items:center;justify-content:center;flex-wrap:wrap;gap:12px;background:#fff;border-bottom:1px solid #cfd5de;padding:8px 16px;font-size:14px}
@@ -123,11 +128,16 @@ td.sel,td.sel:focus{outline:3px solid #d9480f;outline-offset:-3px;background:#ff
    <button id="mBack" title="회원명부 화면을 닫고 조편성 화면으로 돌아갑니다. 저장하지 않은 편집 내용은 버려집니다.">닫기</button>
    <button id="mExp" title="현재 표 내용을 CSV 파일로 저장합니다.">CSV 내보내기</button>
    <button id="mImp" title="CSV 파일을 선택해 표 내용을 교체합니다(저장하기 전까지는 시트에 반영되지 않습니다).">CSV 불러오기</button>
-   <button id="mZipRep" title="소스에 내장된 회원명단 zip을 새 zip으로 바꾼 HTML 파일을 만들어 내려받습니다(지금 화면은 바뀌지 않고, 새 파일을 열면 적용됩니다).">내장zip 교체</button>
-   <button id="mZip" aria-pressed="false" title="소스에 내장된 회원명단 zip의 최신 CSV를 현재 명단으로 사용합니다. 사용중에는 저장·백업본으로 복구를 할 수 없고, 다시 누르면 시트 명단으로 돌아갑니다(시작 시 불러온 명단을 복원하고, 시트에 더 새로운 명단이 있으면 알려 줍니다).">내장zip 사용하기</button>
+   <button id="mZipRep" title="소스에 내장된 회원명단 zip을 새 zip으로 바꾼 HTML 파일을 만들어 내려받습니다(지금 화면은 바뀌지 않고, 새 파일을 열면 적용됩니다).">내장zip 파일 바꾸기</button>
+   <span class="hint" title="명단을 어디서 가져올지 고릅니다. 시트: 구글 시트 명단(저장·백업본 복구 가능). 내장zip: 소스에 내장된 회원명단 zip의 최신 CSV(저장·백업본 복구 불가).">명단 출처</span>
+   <span id="mSrc" class="seg" role="group" aria-label="명단 출처" title="명단을 어디서 가져올지 고릅니다. 시트: 구글 시트 명단(저장·백업본 복구 가능). 내장zip: 소스에 내장된 회원명단 zip의 최신 CSV(저장·백업본 복구 불가).">
+    <button id="mSrcSheet" aria-pressed="false" title="구글 시트의 회원명단을 사용합니다. 내장zip 사용 중이면 시작 시 불러온 명단을 복원하고, 시트에 더 새로운 명단이 있으면 알려 줍니다.">시트</button>
+    <button id="mSrcZip" aria-pressed="false" title="소스에 내장된 회원명단 zip의 최신 CSV를 현재 명단으로 사용합니다. 사용 중에는 저장·백업본으로 복구를 할 수 없습니다(편집·CSV 내보내기·수정취소는 가능). 시트 칸을 누르면 돌아갑니다.">내장zip</button>
+   </span>
    <input type="file" id="mFile" accept=".csv,text/csv" style="display:none">
    <span class="hint" id="mInfo"></span>
   </div>
+  <div class="hint" id="mSrcInfo" title="지금 조편성·회원명부·출석 변화에 쓰이는 명단의 출처입니다." style="margin-top:4px">명단을 불러오는 중...</div>
   <div class="row" style="margin-top:6px">
    <button id="mAdd" title="표 맨 아래에 빈 행을 추가합니다.">행 추가</button>
    <button id="mDel" title="체크한 행을 삭제합니다. 삭제 전에 확인 창이 나옵니다.">선택행 삭제</button>
@@ -728,7 +738,7 @@ function bkLabel(n){
 function bkHide(){$('bkDlg').style.display='none';}
 function bkOpen(){
  if(memSaving||bkBusy)return;
- if(rosterSrc==='zip'){showMemWarn(['내장zip을 사용 중에는 백업본으로 복구할 수 없습니다. 사용안함으로 바꾼 뒤 이용하세요.']);return;}
+ if(rosterSrc==='zip'){showMemWarn(['내장zip을 사용 중에는 백업본으로 복구할 수 없습니다. 명단 출처를 \'시트\'로 바꾼 뒤 이용하세요.']);return;}
  if(rosterSrc!=='sheet'){showMemWarn(['시트 연결 후 사용할 수 있습니다. 페이지를 새로고침해 시트를 다시 불러오세요.']);return;}
  const L=$('bkList');L.textContent='백업 목록을 불러오는 중입니다...';$('bkDlg').style.display='block';
  bkFetch('?action=backups').then(d=>{
@@ -786,7 +796,7 @@ function pwSubmit(){const pw=$('pwIn').value;if(!pw){$('pwIn').focus();return;}c
 function memSave(){
  if(memSaving)return;
  if(rosterSrc==='builtin'){const m='내장 명단을 사용 중이므로 저장할 수 없습니다.\n회원명부 관리를 위해서는 페이지를 새로고침하여 재접속을 시도하세요.';showMemWarn([m]);alert(m);return;}
- if(rosterSrc==='zip'){const m='내장zip을 사용 중이므로 저장할 수 없습니다.\n저장하려면 \'내장zip\'을 사용안함으로 바꾼 뒤 시트 명단으로 다시 불러오세요.';showMemWarn([m]);alert(m);return;}
+ if(rosterSrc==='zip'){const m='내장zip을 사용 중이므로 저장할 수 없습니다.\n저장하려면 명단 출처를 \'시트\'로 바꾸세요.';showMemWarn([m]);alert(m);return;}
  if(rosterSrc!=='sheet'){showMemWarn(['시트 연결 후 저장하세요. 페이지를 새로고침해 시트를 다시 불러오세요.']);return;}
  const v=validateTbl(readTbl());
  if(v.errs.length){showMemWarn(v.errs);return;}
@@ -903,7 +913,7 @@ function mzLabel(n){
 }
 function mzGet(n){const it=MZ.r&&MZ.r.items.find(x=>x.name===n);return it?Promise.resolve(it.map):Promise.reject(chgFatal('내장zip에서 찾지 못했습니다: '+n));}
 function chgList(){return rosterSrc==='zip'?mzLoad().then(z=>({ok:true,backups:z.items.slice(1).map(x=>x.name)})):bkFetch('?action=backups');}
-function zipSync(){const b=$('mZip');if(!b)return;const on=rosterSrc==='zip';b.textContent=on?'내장zip 사용중 · 해제':'내장zip 사용하기';b.setAttribute('aria-pressed',on?'true':'false');b.classList.toggle('pri',on);}
+function zipSync(){const a=$('mSrcSheet'),b=$('mSrcZip'),s=$('mSrcInfo');if(!a||!b||!s)return;const sh=rosterSrc==='sheet',zp=rosterSrc==='zip',bi=rosterSrc==='builtin';a.classList.toggle('on',sh);b.classList.toggle('on',zp);a.setAttribute('aria-pressed',sh?'true':'false');b.setAttribute('aria-pressed',zp?'true':'false');s.classList.toggle('warn',zp||bi);s.textContent=sh?'현재 명단: 시트 명단':zp?'현재 명단: 내장zip (최신 '+(MZ.r&&MZ.r.items.length?mzDate(MZ.r.items[0].date):'?')+') · 저장·백업 복구 불가':bi?'현재 명단: 내장 명단(시트 연결 실패) · 저장·백업 복구 불가':'명단을 불러오는 중...';}
 function shReload(){/* 시트에서 명단을 다시 불러온다(보관본이 없을 때, 또는 새 명단 확인 후 사용자가 확인했을 때) */
  $('mInfo').textContent='시트 명단을 불러오는 중...';
  loadRoster(()=>{
@@ -1027,7 +1037,8 @@ async function bzMake(){
 }
 function bzDragOk(ev){const t=ev.dataTransfer&&ev.dataTransfer.types;return !!t&&Array.from(t).includes('Files');}
 $('mZipRep').addEventListener('click',bzOpen);
-$('mZip').addEventListener('click',zipUse);
+$('mSrcZip').addEventListener('click',()=>{if(rosterSrc!=='zip')zipUse();});
+$('mSrcSheet').addEventListener('click',()=>{if(rosterSrc==='zip')zipUse();else if(rosterSrc==='builtin')showMemWarn(['시트 연결에 실패해 내장 명단을 사용 중입니다. 페이지를 새로고침해 시트를 다시 불러오세요.']);else if(!rosterSrc||rosterLoading)showMemWarn(['명단을 불러오는 중입니다. 잠시 후 다시 누르세요.']);});
 $('bzNo').addEventListener('click',bzHide);
 $('bzGo').addEventListener('click',bzMake);
 $('bzDrop').addEventListener('click',()=>$('bzFile').click());
